@@ -2,30 +2,35 @@
 
 void View::SetChar(int x, int y, char ch, char color)
 {
-SwitchColor(color);
+SetColor(color);
 
 COORD cursor = { static_cast<short>(x) , static_cast<short>(y) };
 SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), cursor);
 
 std::cout << ch;
 
-SwitchColor('0');
+SetColor(15);
 }
 
-void View::SwitchColor(char color = '0')
+void View::SetColor(int color)
 {
-char arr[] = "color 00";
-arr[7] = color;
-system(arr);
+SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
 }
 
-void SetWindowSize(int height, int width) {
+void View::SetWindowSize(int height, int width) {
 SMALL_RECT window;
 window.Top = 0;
 window.Left = 0;
 window.Bottom = height - 1;
 window.Right = width - 1;
 SetConsoleWindowInfo(GetStdHandle(STD_OUTPUT_HANDLE), TRUE, &window);
-COORD buffer = { width,height };
+COORD buffer = { static_cast<short>(width), static_cast<short>(height) };
 SetConsoleScreenBufferSize(GetStdHandle(STD_OUTPUT_HANDLE), buffer);
+}
+
+void View::SetCursorVisibility(bool show) {
+CONSOLE_CURSOR_INFO cursor;
+GetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &cursor);
+cursor.bVisible = show;
+SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &cursor);
 }
