@@ -25,22 +25,28 @@ void Player::move()
   if (isRight) {
    currentPos.x++;
 
-   bool isOutOfBounds = (currentPos.x > getPlayingFieldWidth());
+   bool isOutOfBounds = (currentPos.x > getPlayingFieldWidth() - 1);
    if (isOutOfBounds) {
-	currentPos.x == 0;
+	currentPos.x = 0;
    }
   }
  }
  {
   bool isLeft = (direction == getDirectionLeft());
-  if (isLeft)
+  if (isLeft) {
    currentPos.x--;
+
+   bool isOutOfBounds = (currentPos.x == -1);
+   if (isOutOfBounds) {
+    currentPos.x = getPlayingFieldWidth() - 1;
+   }
+  }
  }
 }
 
 void Player::stepBack()
 {
-	currentPos = oldPos;
+ currentPos = oldPos;
 }
 
 void Player::death() 
@@ -60,25 +66,25 @@ void Player::setSuper(bool super)
 
 bool Player::isSuper()
 {
-	return super;
+ return super;
 }
 
 int Player::getLivesCount()
 {
-	return lives;
+ return lives;
 }
 
 int Player::getColor()
 {
-	return color;
+ return color;
 }
 
 int Player::getCurrentCharacter()
 {
-	return characters[direction];
+ return characters[direction];
 }
 
 Position Player::getPosition()
 {
-	return currentPos;
+ return currentPos;
 }
