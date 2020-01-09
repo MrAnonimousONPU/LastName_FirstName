@@ -1,36 +1,36 @@
 #include "View.h"
 
-void View::SetChar(int x, int y, char ch, char color)
+void View::setChar(int x, int y, char ch, int color)
 {
-SetColor(color);
+ setColor(color);
 
-COORD cursor = { static_cast<short>(x) , static_cast<short>(y) };
-SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), cursor);
+ COORD cursor = { static_cast<short>(x) , static_cast<short>(y) };
+ SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), cursor);
 
-std::cout << ch;
+ std::cout << ch;
 
-SetColor(15);
+ setColor(15);
 }
 
-void View::SetColor(int color)
+void View::setColor(int color)
 {
-SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
+ SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
 }
 
-void View::SetWindowSize(int height, int width) {
-SMALL_RECT window;
-window.Top = 0;
-window.Left = 0;
-window.Bottom = height - 1;
-window.Right = width - 1;
-SetConsoleWindowInfo(GetStdHandle(STD_OUTPUT_HANDLE), TRUE, &window);
-COORD buffer = { static_cast<short>(width), static_cast<short>(height) };
-SetConsoleScreenBufferSize(GetStdHandle(STD_OUTPUT_HANDLE), buffer);
+void View::setWindowSize(int height, int width) {
+ SMALL_RECT window;
+ window.Top = 0;
+ window.Left = 0;
+ window.Bottom = height - 1;
+ window.Right = width - 1;
+ SetConsoleWindowInfo(GetStdHandle(STD_OUTPUT_HANDLE), TRUE, &window);
+ COORD buffer = { static_cast<short>(width), static_cast<short>(height) };
+ SetConsoleScreenBufferSize(GetStdHandle(STD_OUTPUT_HANDLE), buffer);
 }
 
-void View::SetCursorVisibility(bool show) {
-CONSOLE_CURSOR_INFO cursor;
-GetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &cursor);
-cursor.bVisible = show;
-SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &cursor);
+void View::setCursorVisibility(bool show) {
+ CONSOLE_CURSOR_INFO cursor;
+ GetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &cursor);
+ cursor.bVisible = show;
+ SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &cursor);
 }
