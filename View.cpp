@@ -2,6 +2,9 @@
 
 void View::setChar(int x, int y, char ch, int color)
 {
+ static std::mutex local_mutex;
+ std::unique_lock<std::mutex> lock(local_mutex);
+
  setColor(color);
 
  COORD cursor = { static_cast<short>(x) , static_cast<short>(y) };
