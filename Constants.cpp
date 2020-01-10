@@ -42,12 +42,12 @@ int getMaxNumLives()
 
 int getStartX()
 {
-	return 3;
+ return 3;
 }
 
 int getStartY()
 {
-	return 3;
+ return 3;
 }
 
 int getInfoScoreFieldHeight()
@@ -57,7 +57,7 @@ int getInfoScoreFieldHeight()
 
 int getInfoLivesFieldHeight()
 {
-	return 1;
+ return 1;
 }
 
 int getPlayingFieldWidth()
@@ -88,4 +88,24 @@ int getDirectionRight()
 int getDirectionLeft()
 {
  return 3;
+}
+
+int getArrowUp()
+{
+ return 72;
+}
+
+int getArrowDown()
+{
+ return 75;
+}
+
+int getArrowRight()
+{
+ return 77;
+}
+
+int getArrowLeft()
+{
+ return 80;
 }

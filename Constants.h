@@ -21,3 +21,8 @@ int getDirectionUp();
 int getDirectionDown();
 int getDirectionRight();
 int getDirectionLeft();
+
+int getArrowUp();
+int getArrowDown();
+int getArrowRight();
+int getArrowLeft();
