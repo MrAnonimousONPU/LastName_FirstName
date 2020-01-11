@@ -12,6 +12,10 @@ Game::Game()
  level = 0;
 
  mainFrameTime = 0;
+ winTime = 0;
+
+ mainFrameTimer = 0.2f;
+ winTimer = 10.0f;
 
  pacman = new Player(getStartX(), getStartY());
  initMap();
@@ -79,51 +83,74 @@ void Game::updateFrame(float deltaTime)
  if (!isPause)
  {
   mainFrameTime += deltaTime;
-  if (mainFrameTime > 0.2)
+  if (mainFrameTime > mainFrameTimer)
   {
-
-   std::thread oneUp([&]
+   if (isWinner)
    {
-    printOneUp(isOneUp);
-   }); 
-
-   std::thread printLives([&]
-   {
-    printCountOfLives();
-   });
-
-   std::thread printScoreThread([&]
-   {
-    printScore();
-   });
-
-   std::thread movePacman([&]
-   {	
-	int oldX = pacman->getPosition().x;
-	int oldY = pacman->getPosition().y;
-
-	pacman->move();
-	if (checkColision(pacman->getPosition().x, pacman->getPosition().y))
+    if (winTime > winTimer)
 	{
-     pacman->stepBack();
+     gameWin();
+	 winTime = 0;
 	}
-	else 
-	{
-     //checkFood();
-	 printPacman(false, oldX, oldY);
-	 printPacman(true);
-	}
-   });
+    printMap(isWinner);
+	printPacman(true);
+	printScore();
+	winTime += mainFrameTime;
+   }
+   else 
+   {
+    std::thread oneUp([&]
+    {
+     printOneUp(isOneUp);
+    }); 
 
-   mainFrameTime = 0;
-   oneUp.join();
-   printLives.join();
-   printScoreThread.join();
-   movePacman.join();
+    std::thread printLives([&]
+    {
+     printCountOfLives();
+    });
+
+    std::thread printScoreThread([&]
+    {
+     printScore();
+    });
+	 
+    std::thread movePacman([&]
+    {	
+	 int oldX = pacman->getPosition().x;
+	 int oldY = pacman->getPosition().y;
+
+	 pacman->move();
+	 if (checkColision(pacman->getPosition().x, pacman->getPosition().y))
+	 {
+      pacman->stepBack();
+	 }
+	 else 
+	 {
+      checkFood();
+	  printPacman(false, oldX, oldY);
+	  printPacman(true);
+	  //checkDeath();
+	 }
+    });
+
+    mainFrameTime = 0;
+    oneUp.join();
+    printLives.join();
+    printScoreThread.join();
+    movePacman.join();
+   }
+
+   if (pacman->isSuper())
+   {
+    superTime += deltaTime;
+    if(superTime > superTimer)
+    {
+     pacman->setSuper(false);
+    }
+   }
   }
- }
-} 
-
+ } 
+}
 void Game::keyPressed(char ch)
 {
  std::cin.clear();
@@ -290,7 +317,21 @@ void Game::initMap()
 
 void Game::gameWin()
 {
-	//TODO : write this function
+ isWinner = false;
+ printPacman(false);
+ initMap();
+ printMap();
+ pacman->setPosition(getStartX(), getStartY());
+ pacman->setDirection(getDirectionDown());
+ printPacman(true);
+ isPause = true;
+ printPause(isPause);
+
+ level++;
+ if (level > 255)
+ {
+  //
+ }
 }
 
 void Game::printMap(bool winner)
@@ -329,7 +370,7 @@ void Game::printMap(bool winner)
     default:
      if (winner)
      {
-      View::setChar(x, y + getInfoScoreFieldHeight(), j, getColorWhite());
+      View::setChar(x, y + getInfoScoreFieldHeight(), j, rand() % 14);
 	 }
 	 else
 	 {
@@ -346,7 +387,7 @@ void Game::printMap(bool winner)
 bool Game::checkColision(int x, int y)
 {
  unsigned char ch = map[y][x];
- bool hasColision = !(ch == ' ' || ch == static_cast<unsigned char> (250));
+ bool hasColision = !(ch == ' ' || ch == static_cast<unsigned char> (250) || ch == 'o');
 
  return hasColision;
 }
@@ -362,24 +403,26 @@ void Game::checkFood()
  });
 
  unsigned char ch = static_cast<unsigned char> (250);
- unsigned char currentChar = map[x][y];
+ unsigned char currentChar = map[y][x];
  if (currentChar == ch)
  {
   score += 10;
-  map[x][y] = ' ';
+  map[y][x] = ' ';
+  amountOfFood--;
   if (amountOfFood == 0)
   {
-   gameWin();
+   isWinner = true;
   }
  }
  else if (currentChar == 'o')
  {
   score += 50;
   pacman->setSuper(true);
-  map[x][y] = ' ';
+  map[y][x] = ' ';
+  amountOfFood--;
   if (amountOfFood == 0)
   {
-   gameWin();
+   isWinner = true;
   }
  }
 

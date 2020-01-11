@@ -53,6 +53,14 @@ private:
  int level;
 
  float mainFrameTime;
+ float winTime;
+ float spawnFruitTime;
+ float superTime;
+
+ float mainFrameTimer;
+ float winTimer;
+ float spawnFruitTimer;
+ float superTimer;
 
  std::vector<std::string> map;
  std::vector<Position> ghosts;
