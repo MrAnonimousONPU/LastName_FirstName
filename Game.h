@@ -21,25 +21,32 @@ public:
  void run();
 
 private:
-void updateFrame(float deltaTime);
-void keyPressed(char ch);
+ void updateFrame(float deltaTime);
+ void keyPressed(char ch);
 
  void initMap();
- void printMap(bool winner = false);
-bool checkColision(int x, int y);
+ bool checkColision(int x, int y);
+ void checkFood();
+ void checkfruit();
+ void checkDeath();
  void gameOver();
+ void gameWin();
 
+ void printMap(bool winner = false);
  void printOneUp(bool hide);
  void printHightScore();
  void printScore();
  void printCountOfLives();
  void printReady();
  void printPause(bool show);
+ void printPacman(bool show, int x, int y);
+ void printPacman(bool show);
  void printGameOver();
 
  bool isPause;
  bool isWinner;
  bool isOneUp;
+ bool isFirstCheckPassed;
 
  int amountOfFood;
  int score;
@@ -48,6 +55,7 @@ bool checkColision(int x, int y);
  float mainFrameTime;
 
  std::vector<std::string> map;
+ std::vector<Position> ghosts;
 
  Player* pacman;
 };

@@ -5,6 +5,7 @@ Game::Game()
  isWinner = false;
  isOneUp = false;
  isPause = false;
+ isFirstCheckPassed = false;
 
  amountOfFood = 0;
  score = 0;
@@ -19,7 +20,7 @@ Game::Game()
   "╔══════════════════════════╗",
   "║............││............║",
   "║.┌──┐.┌───┐.││.┌───┐.┌──┐.║",
-  "║ │  │.│   │.││.│   │.│  │ ║",
+  "║o│  │.│   │.││.│   │.│  │o║",
   "║.└──┘.└───┘.└┘.└───┘.└──┘.║",
   "║..........................║",
   "║.┌──┐.┌┐.┌──────┐.┌┐.┌──┐.║",
@@ -39,7 +40,7 @@ Game::Game()
   "║............││............║",
   "║.┌──┐.┌───┐.││.┌───┐.┌──┐.║",
   "║.└─┐│.└───┘.└┘.└───┘.│┌─┘.║",
-  "║ ..││.......  .......││.. ║",
+  "║o..││.......  .......││..o║",
   "║─┐.││.┌┐.┌──────┐.┌┐.││.┌─║",
   "║─┘.└┘.││.└──┐┌──┘.││.└┘.└─║",
   "║......││....││....││......║",
@@ -55,6 +56,8 @@ void Game::run()
 {
  printMap();
  printHightScore();
+ printPacman(true);
+ printScore();
  auto startTime = std::chrono::high_resolution_clock::now();
 
  while (true) 
@@ -72,18 +75,51 @@ void Game::run()
 }
 
 void Game::updateFrame(float deltaTime)
-{ 
+{
  if (!isPause)
  {
   mainFrameTime += deltaTime;
-  if (mainFrameTime > 0.35)
+  if (mainFrameTime > 0.2)
   {
-   isOneUp = !isOneUp;
-   printOneUp(isOneUp);
-   printCountOfLives();
-   printScore();
+
+   std::thread oneUp([&]
+   {
+    printOneUp(isOneUp);
+   }); 
+
+   std::thread printLives([&]
+   {
+    printCountOfLives();
+   });
+
+   std::thread printScoreThread([&]
+   {
+    printScore();
+   });
+
+   std::thread movePacman([&]
+   {	
+	int oldX = pacman->getPosition().x;
+	int oldY = pacman->getPosition().y;
+
+	pacman->move();
+	if (checkColision(pacman->getPosition().x, pacman->getPosition().y))
+	{
+     pacman->stepBack();
+	}
+	else 
+	{
+     //checkFood();
+	 printPacman(false, oldX, oldY);
+	 printPacman(true);
+	}
+   });
 
    mainFrameTime = 0;
+   oneUp.join();
+   printLives.join();
+   printScoreThread.join();
+   movePacman.join();
   }
  }
 } 
@@ -157,7 +193,7 @@ void Game::initMap()
   "1555555555555555555555555552",
   "6............^^............6",
   "6.!%%@.!%%%@.^^.!%%%@.!%%@.6",
-  "6 ^  ^.^   ^.^^.^   ^.^  ^ 6",
+  "6o^  ^.^   ^.^^.^   ^.^  ^o6",
   "6.#%%$.#%%%$.#$.#%%%$.#%%$.6",
   "6..........................6",
   "6.!%%@.!@.!%%%%%%@.!@.!%%@.6",
@@ -177,7 +213,7 @@ void Game::initMap()
   "6............^^............6",
   "6.!%%@.!%%%@.^^.!%%%@.!%%@.6",
   "6.#%@^.#%%%$.#$.#%%%$.^!%$.6",
-  "6 ..^^.......  .......^^.. 6",
+  "6o..^^.......  .......^^..o6",
   "6%@.^^.!@.!%%%%%%@.!@.^^.!%6",
   "6%$.#$.^^.#%%@!%%$.^^.#$.#%6",
   "6......^^....^^....^^......6",
@@ -195,6 +231,10 @@ void Game::initMap()
    {
     amountOfFood++;
     map[y][x] = static_cast<unsigned char> (250);
+   }
+   else if (current == 'o')
+   {
+    amountOfFood++;
    }
    else if (current == '1')
    {
@@ -248,6 +288,11 @@ void Game::initMap()
  }
 }
 
+void Game::gameWin()
+{
+	//TODO : write this function
+}
+
 void Game::printMap(bool winner)
 {
  int y = 0;
@@ -269,6 +314,15 @@ void Game::printMap(bool winner)
       View::setChar(x, y + getInfoScoreFieldHeight(), j, getColorWhite());
 	 }
 	 break;
+	case 'o' :
+     if (winner)
+	 {
+      j = ' ';
+	 }
+	 else
+	 {
+      View::setChar(x, y + getInfoScoreFieldHeight(), j, getColorWhite());
+	 }
 	case '-' :
      View::setChar(x, y + getInfoScoreFieldHeight(), j, getColorWhite());
 	 break;
@@ -297,8 +351,44 @@ bool Game::checkColision(int x, int y)
  return hasColision;
 }
 
+void Game::checkFood()
+{
+ int x = pacman->getPosition().x;
+ int y = pacman->getPosition().y;
+
+ std::thread fruitCheck([&]
+ {
+  void checkFruit();
+ });
+
+ unsigned char ch = static_cast<unsigned char> (250);
+ unsigned char currentChar = map[x][y];
+ if (currentChar == ch)
+ {
+  score += 10;
+  map[x][y] = ' ';
+  if (amountOfFood == 0)
+  {
+   gameWin();
+  }
+ }
+ else if (currentChar == 'o')
+ {
+  score += 50;
+  pacman->setSuper(true);
+  map[x][y] = ' ';
+  if (amountOfFood == 0)
+  {
+   gameWin();
+  }
+ }
+
+ fruitCheck.join();
+}
+
 void Game::printOneUp(bool hide)
 {
+ isOneUp = !isOneUp;
  char text[5] = "1 UP";
 
  for (int i = 0; i < 4; i++)
@@ -366,5 +456,35 @@ void Game::printPause(bool show)
  for (int i = 0; i < 5; i++)
  {
   View::setChar(width + i, 0, text[i], color);
+ }
+}
+
+void Game::printPacman(bool show, int x, int y)
+{
+ char ch = pacman->getCurrentCharacter();
+ int color = pacman->getColor();
+ if (show)
+ {
+  View::setChar(x, y + getInfoScoreFieldHeight(), ch, color);
+ }
+ else
+ {
+  View::setChar(x, y + getInfoScoreFieldHeight());
+ }
+}
+
+void Game::printPacman(bool show)
+{
+ char ch = pacman->getCurrentCharacter();
+ int x = pacman->getPosition().x;
+ int y = pacman->getPosition().y + getInfoScoreFieldHeight();
+ int color = pacman->getColor();
+ if (show)
+ {
+  View::setChar(x, y, ch, color);
+ }
+ else
+ {
+  View::setChar(x, y);
  }
 }
