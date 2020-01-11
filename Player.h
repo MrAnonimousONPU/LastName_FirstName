@@ -10,6 +10,7 @@ public:
 
  void move();
  void stepBack();
+ void setPosition(int x, int y);
  void death();
 
  void setDirection(int direction);

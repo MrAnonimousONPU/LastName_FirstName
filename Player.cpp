@@ -2,7 +2,7 @@
 
 Player::Player(int x, int y)
 : lives(getMaxNumLives()), color(getColorYellow()), currentPos{ x, y }, oldPos{ x, y },
-  direction(getDirectionLeft()), super(false), characters{'v', '^', '<', '>'}
+  direction(getDirectionDown()), super(false), characters{'v', '^', '<', '>'}
 {
 }
 
@@ -47,6 +47,14 @@ void Player::move()
 void Player::stepBack()
 {
  currentPos = oldPos;
+}
+
+void Player::setPosition(int x, int y)
+{
+	currentPos.x = x;
+	currentPos.y = y;
+	oldPos = currentPos;
+	direction = (getDirectionLeft());
 }
 
 void Player::death() 
