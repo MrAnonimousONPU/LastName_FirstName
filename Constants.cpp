@@ -42,12 +42,12 @@ int getMaxNumLives()
 
 int getStartX()
 {
- return 3;
+ return getInfoScoreFieldHeight() + 24;
 }
 
 int getStartY()
 {
- return 3;
+ return getPlayingFieldWidth() / 2;
 }
 
 int getInfoScoreFieldHeight()
