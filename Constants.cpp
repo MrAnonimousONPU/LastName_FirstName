@@ -42,7 +42,7 @@ int getMaxNumLives()
 
 int getStartX()
 {
- return 12;
+ return 13;
 }
 
 int getStartY()
@@ -97,7 +97,7 @@ int getArrowUp()
 
 int getArrowDown()
 {
- return 75;
+ return 80;
 }
 
 int getArrowRight()
@@ -107,5 +107,5 @@ int getArrowRight()
 
 int getArrowLeft()
 {
- return 80;
+ return 75;
 }

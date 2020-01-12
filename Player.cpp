@@ -1,8 +1,8 @@
 #include "Player.h"
 
-Player::Player(int x, int y)
-: lives(getMaxNumLives()), color(getColorYellow()), currentPos{ x, y }, oldPos{ x, y },
-  direction(getDirectionDown()), super(false), characters{'v', '^', '<', '>'}
+Player::Player(int x, int y): 
+lives(getMaxNumLives()), color(getColorYellow()), currentPos{x, y}, oldPos{x, y},
+direction(getDirectionLeft()), super(false), characters{'v', '^', '<', '>'}
 {
 }
 

@@ -6,16 +6,21 @@ Game::Game()
  isOneUp = false;
  isPause = false;
  isFirstCheckPassed = false;
+ isFruitSetted = false;
 
  amountOfFood = 0;
  score = 0;
- level = 0;
+ level = 1;
 
  mainFrameTime = 0;
  winTime = 0;
+ deathTime = 0;
+ spawnFruitTime = 0;
 
  mainFrameTimer = 0.2f;
- winTimer = 10.0f;
+ winTimer = 1.0f;
+ deathTimer = 1.0f;
+ spawnFruitTimer = 60.0f;
 
  pacman = new Player(getStartX(), getStartY());
  initMap();
@@ -62,6 +67,10 @@ void Game::run()
  printHightScore();
  printPacman(true);
  printScore();
+ printReady(true);
+ Sleep(2500);
+ printReady(false);
+ 
  auto startTime = std::chrono::high_resolution_clock::now();
 
  while (true) 
@@ -87,6 +96,7 @@ void Game::updateFrame(float deltaTime)
   {
    if (isWinner)
    {
+    winTime += mainFrameTime;
     if (winTime > winTimer)
 	{
      gameWin();
@@ -95,7 +105,6 @@ void Game::updateFrame(float deltaTime)
     printMap(isWinner);
 	printPacman(true);
 	printScore();
-	winTime += mainFrameTime;
    }
    else 
    {
@@ -133,52 +142,71 @@ void Game::updateFrame(float deltaTime)
 	 }
     });
 
-    mainFrameTime = 0;
     oneUp.join();
     printLives.join();
     printScoreThread.join();
     movePacman.join();
-   }
+   
 
-   if (pacman->isSuper())
-   {
-    superTime += deltaTime;
-    if(superTime > superTimer)
+    if (pacman->isSuper())
     {
-     pacman->setSuper(false);
+     superTime += mainFrameTime;
+     if(superTime > superTimer)
+     {
+      pacman->setSuper(false);
+	  superTime = 0;
+     }
     }
+
+	if (!isFruitSetted)
+	{
+     spawnFruitTime += mainFrameTime;
+     if (spawnFruitTime > spawnFruitTimer)
+     {
+     setFruit();
+     spawnFruitTime = 0;
+     }
+	}
    }
+   mainFrameTime = 0;
   }
  } 
 }
-void Game::keyPressed(char ch)
+
+void Game::keyPressed(unsigned char ch)
 {
- std::cin.clear();
+ int arrow = 0;
+ if (ch == 224)
+ {
+  ch = 0;
+
+  arrow = _getch();
+ }
  ch = std::toupper(ch);
 
  int x = pacman->getPosition().x;
  int y = pacman->getPosition().y;
 
- if (ch == 'P')
+ if (ch == 'P' && ch != 224)
  {
   isPause = !isPause;
   printPause(isPause);
  }
- else if (ch == 'W' || ch == getArrowUp())
+ else if (ch == 'W' || arrow == getArrowUp())
  {
   if (!checkColision(x, y - 1))
   {
    pacman->setDirection(getDirectionUp());
   }
  }
- else if (ch == 'S' || ch == getArrowDown())
+ else if (ch == 'S' || arrow == getArrowDown())
  {
   if (!checkColision(x, y + 1))
   {
    pacman->setDirection(getDirectionDown());
   }
  }
- else if (ch == 'D' || ch == getArrowRight())
+ else if (ch == 'D' || arrow == getArrowRight())
  {
   bool isOutOfBounds = (x == getPlayingFieldWidth() - 1);
   if (isOutOfBounds)
@@ -194,7 +222,7 @@ void Game::keyPressed(char ch)
    pacman->setDirection(getDirectionRight());
   }
  }
- else if (ch == 'A' || ch == getArrowLeft())
+ else if (ch == 'A' || arrow == getArrowLeft())
  {
   bool isOutOfBounds = (x == 0);
   if (isOutOfBounds)
@@ -315,22 +343,42 @@ void Game::initMap()
  }
 }
 
+void Game::gameOver()
+{
+ if (score > hightScore)
+ {
+  std::ofstream fout("hightScr.txt", std::ios_base::out | std::ios_base::trunc);
+  fout << score;
+ }
+
+ printGameOver();
+
+ Sleep(5000);
+
+ exit(0);
+}
+
 void Game::gameWin()
 {
  isWinner = false;
+ isFirstCheckPassed = false;
+ isFruitSetted = false;
+
  printPacman(false);
  initMap();
  printMap();
  pacman->setPosition(getStartX(), getStartY());
- pacman->setDirection(getDirectionDown());
+ pacman->setDirection(getDirectionLeft());
  printPacman(true);
- isPause = true;
- printPause(isPause);
+
+ printReady(true);
+ Sleep(2500);
+ printReady(false);
 
  level++;
  if (level > 255)
  {
-  //
+  gameOver();
  }
 }
 
@@ -387,7 +435,11 @@ void Game::printMap(bool winner)
 bool Game::checkColision(int x, int y)
 {
  unsigned char ch = map[y][x];
- bool hasColision = !(ch == ' ' || ch == static_cast<unsigned char> (250) || ch == 'o');
+ unsigned char food = static_cast<unsigned char> (250);
+ unsigned char fruitChar = static_cast<unsigned char> (253);
+
+ bool isCanGo = (ch == ' ' || ch == food || ch == 'o' || ch == fruitChar);
+ bool hasColision = !(isCanGo);
 
  return hasColision;
 }
@@ -397,12 +449,8 @@ void Game::checkFood()
  int x = pacman->getPosition().x;
  int y = pacman->getPosition().y;
 
- std::thread fruitCheck([&]
- {
-  void checkFruit();
- });
-
  unsigned char ch = static_cast<unsigned char> (250);
+ unsigned char fruitChar = static_cast<unsigned char> (253);
  unsigned char currentChar = map[y][x];
  if (currentChar == ch)
  {
@@ -425,8 +473,66 @@ void Game::checkFood()
    isWinner = true;
   }
  }
+ else if (currentChar == fruitChar)
+ {
+  score += 100;
+  map[y][x] = ' ';
+  fruits.push_front(fruit);
 
- fruitCheck.join();
+  if(fruits.size() > 8)
+  {
+   fruits.pop_back();
+  }
+  printFruits();
+  isFruitSetted = false;
+ }
+}
+
+void Game::setFruit()
+{
+ fruit = (rand() % 15) + 1;
+ unsigned char fruitChar = static_cast<unsigned char> (253);
+
+ int x = 0;
+ int y = 0;
+ switch (rand() % 8) {
+  case 0 :
+   x = 11;
+   y = 11;
+   break;
+  case 1 :
+   x = 16;
+   y = 11;
+   break;
+  case 2 :
+   x = 9;
+   y = 13;
+   break;
+  case 3 :
+   x = 18;
+   y = 13;
+   break;
+  case 4 :
+   x = 9;
+   y = 15;
+   break;
+  case 5 :
+   x = 18;
+   y = 15;
+   break;
+  case 6 :
+   x = 11;
+   y = 17;
+   break;
+  case 7 :
+   x = 13;
+   y = 17;
+   break;
+ }
+ map[y][x] = fruitChar;
+ View::setChar(x, y + getInfoScoreFieldHeight(), fruitChar, fruit);
+
+ isFruitSetted = true;
 }
 
 void Game::printOneUp(bool hide)
@@ -486,6 +592,36 @@ void Game::printCountOfLives()
  }
 }
 
+void Game::printFruits()
+{
+ unsigned char fruitChar = static_cast<unsigned char> (253);
+ for (unsigned int i = 0; i < fruits.size(); i++)
+ {
+  int x = getPlayingFieldWidth() - 2 - i;
+  int y = getInfoScoreFieldHeight() + getPlayingFieldHeight();
+  View::setChar(x, y, fruitChar, fruits[i]);
+ }
+}
+
+void Game::printReady(bool show)
+{
+ char text[6] = "READY";
+
+ int y = getInfoScoreFieldHeight() + 17;
+
+ for (int i = 0; i < 5; i++)
+ {
+  if (show)
+  {
+   View::setChar(i + 11, y, text[i], getColorWhite());
+  }
+  else
+  {
+   View::setChar(i + 11, y);
+  }
+ }
+}
+
 void Game::printPause(bool show)
 {
  char text[6] = "Pause";
@@ -529,5 +665,17 @@ void Game::printPacman(bool show)
  else
  {
   View::setChar(x, y);
+ }
+}
+
+void Game::printGameOver()
+{
+ char text[10] = "GAME OVER";
+
+ int y = getInfoScoreFieldHeight() + 17;
+
+ for (int i = 0; i < 9; i++)
+ {
+  View::setChar(i + 9, y, text[i], getColorWhite());
  }
 }
