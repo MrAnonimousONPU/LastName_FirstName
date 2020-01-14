@@ -15,6 +15,11 @@ int getColorCyan()
  return 11;
 }
 
+int getColorPink()
+{
+	return 13;
+}
+
 int getColorRed()
 {
  return 12;
@@ -35,9 +40,19 @@ int getColorWhite()
  return 15;
 }
 
+int getCountOfGhosts()
+{
+	return 4;
+}
+
 int getMaxNumLives()
 {
  return 3;
+}
+
+int getMaxFood()
+{
+ return 244;
 }
 
 int getStartX()
@@ -48,6 +63,16 @@ int getStartX()
 int getStartY()
 {
  return 23;
+}
+
+int getGateX()
+{
+	return 14;
+}
+
+int getGateY()
+{
+	return 12;
 }
 
 int getInfoScoreFieldHeight()
@@ -108,4 +133,54 @@ int getArrowRight()
 int getArrowLeft()
 {
  return 75;
+}
+
+int getGhostBlinky()
+{
+	return 0;
+}
+
+int getGhostPinky()
+{
+	return 1;
+}
+
+int getGhostInky()
+{
+	return 2;
+}
+
+int getGhostClyde()
+{
+	return 3;
+}
+
+int getModeDead()
+{
+	return 4;
+}
+
+int getModeWait()
+{
+	return 3;
+}
+
+int getModeChase()
+{
+	return 0;
+}
+
+int getModeScatter()
+{
+	return 1;
+}
+
+int getModeFrightened()
+{
+	return 2;
+}
+
+int getModeExiting()
+{
+	return 5;
 }

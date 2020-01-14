@@ -10,50 +10,26 @@ void Player::move()
 {
  oldPos = currentPos;
 
- {
-  bool isUp = (direction == getDirectionUp());
-  if (isUp)
-   currentPos.y--;
- }
- {
-  bool isDown = (direction == getDirectionDown());
-  if (isDown)
-   currentPos.y++;
- }
- {
-  bool isRight = (direction == getDirectionRight());
-  if (isRight) {
-   currentPos.x++;
+ bool isHorisontal = (direction == getDirectionLeft());
+ isHorisontal = (isHorisontal || direction == getDirectionRight());
 
-   bool isOutOfBounds = (currentPos.x > getPlayingFieldWidth() - 1);
-   if (isOutOfBounds) {
-	currentPos.x = 0;
-   }
-  }
- }
+ if (isHorisontal)
  {
-  bool isLeft = (direction == getDirectionLeft());
-  if (isLeft) {
-   currentPos.x--;
-
-   bool isOutOfBounds = (currentPos.x == -1);
-   if (isOutOfBounds) {
-    currentPos.x = getPlayingFieldWidth() - 1;
-   }
-  }
+  currentPos.x += direction == getDirectionLeft() ? -1 : 1;
+  if (currentPos.x == getPlayingFieldWidth())
+   currentPos.x = 0;
+  else if (currentPos.x == -1)
+   currentPos.x = getPlayingFieldWidth() - 1;
  }
-}
-
-void Player::stepBack()
-{
- currentPos = oldPos;
+ else
+  currentPos.y += direction == getDirectionUp() ? -1 : 1;
 }
 
 void Player::setPosition(int x, int y)
 {
+ oldPos = currentPos;
 	currentPos.x = x;
 	currentPos.y = y;
-	oldPos = currentPos;
 	direction = (getDirectionLeft());
 }
 
@@ -92,7 +68,17 @@ int Player::getCurrentCharacter()
  return characters[direction];
 }
 
+int Player::getDirection()
+{
+ return direction;
+}
+
 Position Player::getPosition()
 {
  return currentPos;
+}
+
+Position Player::getOldPosition()
+{
+ return oldPos;
 }

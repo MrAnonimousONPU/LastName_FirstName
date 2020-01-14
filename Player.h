@@ -1,15 +1,14 @@
 #pragma once
 
-#include "Unit.h"
 #include "Constants.h"
+#include "Position.h"
 
-class Player : Unit
+class Player
 {
 public:
  Player(int x, int y);
 
  void move();
- void stepBack();
  void setPosition(int x, int y);
  void death();
 
@@ -20,7 +19,9 @@ public:
  int getLivesCount();
  int getColor();
  int getCurrentCharacter();
+ int getDirection();
  Position getPosition(); 
+ Position getOldPosition();
 
 private:
  int lives;
