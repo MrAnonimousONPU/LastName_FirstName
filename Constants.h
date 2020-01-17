@@ -27,6 +27,9 @@ int getDirectionDown();
 int getDirectionRight();
 int getDirectionLeft();
 
+int getFruitX();
+int getFruitY();
+
 int getArrowUp();
 int getArrowDown();
 int getArrowRight();
@@ -43,3 +46,12 @@ int getModeChase();
 int getModeScatter();
 int getModeFrightened();
 int getModeExiting();
+
+int getStartXBlinky();
+int getStartYBlinky();
+int getStartXPinky();
+int getStartYPinky();
+int getStartXInky();
+int getStartYInky();
+int getStartXClyde();
+int getStartYClyde();

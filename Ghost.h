@@ -10,7 +10,7 @@
 class Ghost
 {
 public:
- Ghost(int x, int y, int typeGhost, std::vector<std::string>& map);
+ Ghost(int x, int y, int typeGhost,const std::vector<std::string>& map);
 
  void move(int playerX, int playerY);
 

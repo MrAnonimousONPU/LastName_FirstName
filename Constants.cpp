@@ -115,6 +115,16 @@ int getDirectionLeft()
  return 3;
 }
 
+int getFruitX()
+{
+ return 14;
+}
+
+int getFruitY()
+{
+ return 17;
+}
+
 int getArrowUp()
 {
  return 72;
@@ -183,4 +193,44 @@ int getModeFrightened()
 int getModeExiting()
 {
 	return 5;
+}
+
+int getStartXBlinky()
+{
+ return 14;
+}
+
+int getStartYBlinky()
+{
+ return 11;
+}
+
+int getStartXPinky()
+{
+ return 15;
+}
+
+int getStartYPinky()
+{
+ return 15;
+}
+
+int getStartXInky()
+{
+ return 12;
+}
+
+int getStartYInky()
+{
+ return 13;
+}
+
+int getStartXClyde()
+{
+ return 15;
+}
+
+int getStartYClyde()
+{
+ return 13;
 }

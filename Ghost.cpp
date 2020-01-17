@@ -1,6 +1,6 @@
 #include "Ghost.h"
 
-Ghost::Ghost(int x, int y, int typeGhost, std::vector<std::string>& map) :
+Ghost::Ghost(int x, int y, int typeGhost, const std::vector<std::string>& map) :
  map(map), pos({x, y}), oldPos({x, y}), character('M'),
  direction(getDirectionLeft()), oldDirection(direction), typeGhost(typeGhost)
 {

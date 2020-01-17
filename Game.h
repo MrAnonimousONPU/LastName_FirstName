@@ -30,7 +30,7 @@ private:
  void updateFrame(float deltaTime);
  void keyPressed(unsigned char ch);
 
- bool checkColision(int x, int y);
+ bool isColision(int x, int y);
  int getReverseMod(int mode);
  void initMap();
  void checkFood();
@@ -39,6 +39,18 @@ private:
  void death();
  void gameOver();
  void gameWin();
+ void releaseGhosts();
+
+ void movePlayer();
+ void moveNormalGhosts();
+ void moveAbnormalGhosts(int mode);
+ void moveGhostPinky(Ghost* ghost);
+ void moveGhostInky(Ghost* ghost);
+ void moveGhostClyde(Ghost* ghost);
+
+ void warnPlayer();
+ void setSuper(bool super);
+ void changeWave();
 
  void printMap(bool winner = false);
  void printOneUp(bool hide);
@@ -80,7 +92,6 @@ private:
  float deadGhostMoveTime;
  float frightenedMoveTime;
  float winTime;
- float deathTime;
  float spawnFruitTime;
  float superTime;
  float warningTime;
@@ -88,15 +99,14 @@ private:
 
  float fpsTime;
 
- float waveTimer;
- float unitMoveTimer;
- float deadGhostMoveTimer;
- float frightenedMoveTimer;
- float winTimer;
- float deathTimer;
- float spawnFruitTimer;
  float superTimer;
- float warningTimer;
+ float waveTimer;
+ const float unitMoveTimer;
+ const float deadGhostMoveTimer;
+ const float frightenedMoveTimer;
+ const float winTimer;
+ const float spawnFruitTimer;
+ const float warningTimer;
 
  Position moveToDirection();
 
