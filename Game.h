@@ -1,4 +1,5 @@
-#pragma once
+#ifndef GAME_H
+#define GAME_H
 
 #include <iostream>
 #include <string>
@@ -15,9 +16,9 @@
 
 #include "Player.h"
 #include "Ghost.h"
-#include "View.h"
+#include "Draw.h"
 
-class Game
+class Game : Draw
 {
 public:
  Game();
@@ -32,7 +33,9 @@ private:
 
  bool isColision(int x, int y);
  int getReverseMod(int mode);
+
  void initMap();
+ void initHightScore();
  void checkFood();
  void setFruit();
  void checkDeath();
@@ -52,21 +55,7 @@ private:
  void setSuper(bool super);
  void changeWave();
 
- void printMap(bool winner = false);
- void printOneUp(bool hide);
- void printHightScore();
- void printScore();
- void printCountOfLives();
- void printFruits();
- void printReady(bool show);
- void printPause(bool show);
- void printGhost(Ghost* current, bool isWarning = false);
- void printCombo();
- void printPacman(bool show);
- void printGameOver();
-
- void printFPS(float deltaTime);
-
+private:
  bool isPause;
  bool isWinner;
  bool isOneUp;
@@ -85,8 +74,6 @@ private:
  int level;
  const int blinky;
 
- int fpsCount;
-
  float waveTime;
  float unitMoveTime;
  float deadGhostMoveTime;
@@ -96,8 +83,6 @@ private:
  float superTime;
  float warningTime;
  float checkWaitTime;
-
- float fpsTime;
 
  float superTimer;
  float waveTimer;
@@ -117,3 +102,4 @@ private:
  Player* pacman;
 };
 
+#endif

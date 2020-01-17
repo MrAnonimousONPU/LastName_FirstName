@@ -1,4 +1,5 @@
-#pragma once
+#ifndef CONSTANTS_H
+#define CONSTANTS_H
 
 int getColorBlack();
 int getColorBlue();
@@ -55,3 +56,5 @@ int getStartXInky();
 int getStartYInky();
 int getStartXClyde();
 int getStartYClyde();
+
+#endif

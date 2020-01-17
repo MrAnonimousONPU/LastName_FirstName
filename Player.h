@@ -1,4 +1,5 @@
-#pragma once
+#ifndef PLAYER_H
+#define PLAYER_H
 
 #include "Constants.h"
 #include "Position.h"
@@ -15,13 +16,13 @@ public:
  void setDirection(int direction);
  void setSuper(bool super);
 
- bool isSuper();
- int getLivesCount();
- int getColor();
- int getCurrentCharacter();
- int getDirection();
- Position getPosition(); 
- Position getOldPosition();
+ bool isSuper() const;
+ int getLivesCount() const;
+ int getColor() const;
+ int getCurrentCharacter() const;
+ int getDirection() const;
+ const Position& getPosition() const;
+ const Position& getOldPosition() const;
 
 private:
  int lives;
@@ -35,3 +36,5 @@ private:
  Position currentPos;
  Position oldPos;
 };
+
+#endif

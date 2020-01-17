@@ -1,4 +1,5 @@
-#pragma once
+#ifndef GHOST_H
+#define GHOST_H
 
 #include <vector>
 #include <cmath>
@@ -19,13 +20,13 @@ public:
  void setDirection(int direction);
  void setMode(int mode);
 
- int getColor();
- int getCharacter();
- int getMode();
- int getType();
- Position getPosition();
- Position getOldPosition();
- Position getScatterPosition();
+ int getColor() const;
+ int getCharacter() const;
+ int getMode() const;
+ int getType() const;
+ const Position& getPosition() const;
+ const Position& getOldPosition() const;
+ const Position& getScatterPosition() const;
 
 private:
  int color;
@@ -56,3 +57,5 @@ private:
  int specificX[2];
  int specificY[2];
 };
+
+#endif

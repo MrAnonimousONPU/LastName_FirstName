@@ -165,7 +165,7 @@ void Ghost::setMode(int mode)
  this->mode = mode;
 }
 
-int Ghost::getColor()
+int Ghost::getColor() const
 {
  if (mode == getModeDead())
   return getColorWhite();
@@ -175,7 +175,7 @@ int Ghost::getColor()
   return color;
 }
 
-int Ghost::getCharacter()
+int Ghost::getCharacter() const
 {
  if (mode == getModeDead())
   return ('\"');
@@ -183,27 +183,27 @@ int Ghost::getCharacter()
   return character;
 }
 
-int Ghost::getMode()
+int Ghost::getMode() const
 {
 	return mode;
 }
 
-int Ghost::getType()
+int Ghost::getType() const
 {
  return typeGhost;
 }
 
-Position Ghost::getPosition()
+const Position& Ghost::getPosition() const
 {
  return pos;
 }
 
-Position Ghost::getOldPosition()
+const Position& Ghost::getOldPosition() const
 {
 	return oldPos;
 }
 
-Position Ghost::getScatterPosition()
+const Position& Ghost::getScatterPosition() const
 {
  return scatterPos;
 }

@@ -1,20 +1,25 @@
-#pragma once
+#ifndef VIEW_H
+#define VIEW_H
 
 #include <Windows.h>
 #include <iostream>
 #include <mutex>
+#include <string>
 #include "Constants.h"
 
 class View
 {
-public:
+protected:
  //Sets the specified character to the specified position
- static void setChar(int x, int y, char ch = ' ', int color = getColorBlue());
+ void SetWindowTitle();
 
- static void setWindowSize(int height, int width);
+ void setChar(int x, int y, char ch = ' ', int color = getColorBlue());
 
- static void setColor(int color);
+ void setWindowSize(int height, int width);
 
- static void setCursorVisibility(bool show);
+ void setColor(int color);
+
+ void setCursorVisibility(bool show);
 };
 
+#endif

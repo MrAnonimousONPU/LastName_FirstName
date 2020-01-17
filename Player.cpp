@@ -48,37 +48,37 @@ void Player::setSuper(bool super)
  this->super = super;
 }
 
-bool Player::isSuper()
+bool Player::isSuper() const
 {
  return super;
 }
 
-int Player::getLivesCount()
+int Player::getLivesCount() const
 {
  return lives;
 }
 
-int Player::getColor()
+int Player::getColor() const
 {
  return color;
 }
 
-int Player::getCurrentCharacter()
+int Player::getCurrentCharacter() const
 {
  return characters[direction];
 }
 
-int Player::getDirection()
+int Player::getDirection() const
 {
  return direction;
 }
 
-Position Player::getPosition()
+const Position& Player::getPosition() const
 {
  return currentPos;
 }
 
-Position Player::getOldPosition()
+const Position& Player::getOldPosition() const
 {
  return oldPos;
 }

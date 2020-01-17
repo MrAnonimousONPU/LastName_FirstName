@@ -1,7 +1,8 @@
 ﻿#include "Game.h"
 
-Game::Game() : isWinner(false), isOneUp(false), isPause(false),
-isFruitSetted(false), warning(false),
+Game::Game() : Draw(),
+ isWinner(false), isOneUp(false), isPause(false),
+ isFruitSetted(false), warning(false),
 
 amountOfFood(0), score(0), combo(100), level(1), waveCount(0),
 waveMod(getModeScatter()), blinky(0),
@@ -14,8 +15,10 @@ unitMoveTimer(0.15f), deadGhostMoveTimer(0.05f), frightenedMoveTimer(0.3f),
 winTimer(1.0f), spawnFruitTimer(60.0f), superTimer(10.0f), warningTimer(0.2f),
 waveTimer(7.0f)
 {
+ srand(time(static_cast<unsigned int> (0)));
  pacman = new Player(getStartX(), getStartY());
  initMap();
+ initHightScore();
  /*
  map = {
   "╔══════════════════════════╗",
@@ -83,17 +86,17 @@ Game::~Game()
 
 void Game::run()
 {
- printMap();
- printScore();
- printHightScore();
- printCountOfLives();
- printPacman(true);
+ printMap(map);
+ printScore(score);
+ printHightScore(hightScore);
+ printCountOfLives(pacman->getLivesCount());
+ printPacman(*pacman, true);
 
  for (int i = 0; i < getCountOfGhosts(); i++)
  {
   if (NULL != ghosts[i])
   {
-   printGhost(ghosts[i]);
+   printGhost(*ghosts[i], false, fruit, map);
   }
  }
 
@@ -131,8 +134,8 @@ void Game::updateFrame(float deltaTime)
     gameWin();
     winTime = 0;
    }
-   printMap(isWinner);
-   printPacman(true);
+   printMap(map, isWinner);
+   printPacman(*pacman, true);
   }
   else
   {
@@ -240,39 +243,52 @@ void Game::keyPressed(unsigned char ch)
  else if ('W' == ch || arrow == getArrowUp())
  {
   if (!isColision(x, y - 1))
+  {
    pacman->setDirection(getDirectionUp());
-  
+  }
   prevButton = 'W';
  }
  else if ('S' == ch || arrow == getArrowDown())
  {
   if (!isColision(x, y + 1))
+  {
    pacman->setDirection(getDirectionDown());
-  
+  }
   prevButton = 'S';
  }
  else if ('D' == ch || arrow == getArrowRight())
  {
   const bool isOutOfBounds = (x == getPlayingFieldWidth() - 1);
   if (isOutOfBounds)
+  {
    x = 0;
-  else 
+  }
+  else
+  {
    x++;
+  }
   if (!isColision(x, y))
+  {
    pacman->setDirection(getDirectionRight());
-  
+  }
   prevButton = 'D';
  }
  else if ('A' == ch || arrow == getArrowLeft())
  {
   const bool isOutOfBounds = (x == 0);
   if (isOutOfBounds)
+  {
    x = getPlayingFieldWidth() - 1;
-  else 
+  }
+  else
+  {
    x--;
+  }
   if (!isColision(x, y))
+  {
    pacman->setDirection(getDirectionLeft());
-  
+  }
+
   prevButton = 'A';
  }
 
@@ -380,6 +396,19 @@ void Game::initMap()
  }
 }
 
+void Game::initHightScore()
+{
+ std::string highScore = "0";
+
+ std::ifstream fin("hightScr.bin", std::ios_base::binary);
+ if (fin.is_open())
+ {
+  fin >> highScore;
+ }
+
+ hightScore = std::stoi(highScore);
+}
+
 void Game::gameOver()
 {
  if (score > hightScore)
@@ -402,18 +431,18 @@ void Game::gameWin()
 
  combo = 100;
 
- printPacman(false);
+ printPacman(*pacman, false);
  initMap();
- printMap();
+ printMap(map);
  pacman->setPosition(getStartX(), getStartY());
  pacman->setDirection(getDirectionLeft());
 
  for (int i = 0; i < getCountOfGhosts(); i++)
  {
   ghosts[i]->setStartPosition();
-  printGhost(ghosts[i]);
+  printGhost(*ghosts[i], false, fruit, map);
  }
- printPacman(true);
+ printPacman(*pacman, true);
 
  printReady(true);
  Sleep(2500);
@@ -473,8 +502,8 @@ void Game::movePlayer()
  if (!isColision(pos.x, pos.y))
  {
   pacman->move();
-  printPacman(false);
-  printPacman(true);
+  printPacman(*pacman, false);
+  printPacman(*pacman, true);
   checkFood();
   checkDeath();
  }
@@ -504,8 +533,8 @@ void Game::moveNormalGhosts()
    {
     moveGhostClyde(ghosts[i]);
    }
-   printGhost(ghosts[i]);
-   printPacman(true);
+   printGhost(*ghosts[i], false, fruit, map);
+   printPacman(*pacman, true);
    checkDeath();
   }
  }
@@ -518,8 +547,8 @@ void Game::moveAbnormalGhosts(int mode)
   if (mode == ghosts[i]->getMode())
   {
    ghosts[i]->move(0, 0);
-   printGhost(ghosts[i]);
-   printPacman(true);
+   printGhost(*ghosts[i], false, fruit, map);
+   printPacman(*pacman, true);
   }
  }
 }
@@ -581,7 +610,7 @@ void Game::warnPlayer()
  {
   if (ghosts[i]->getMode() == getModeFrightened())
   {
-   printGhost(ghosts[i], warning);
+   printGhost(*ghosts[i], warning, fruit, map);
   }
  }
 }
@@ -650,42 +679,6 @@ void Game::changeWave()
  }
 }
 
-void Game::printMap(bool winner)
-{
- int y = 0;
- for (std::string i : map)
- {
-  int x = 0;
-  for (unsigned char j : i)
-  {
-   switch (j)
-   {
-    case static_cast<unsigned char> (250) :
-     View::setChar(x, y + getInfoScoreFieldHeight(), j, getColorWhite());
-	    break;
-	   case 'o' :
-     View::setChar(x, y + getInfoScoreFieldHeight(), j, getColorWhite());
-     break;
-	   case '-' :
-     View::setChar(x, y + getInfoScoreFieldHeight(), j, getColorWhite());
-	    break;
-    default:
-     if (winner)
-     {
-      View::setChar(x, y + getInfoScoreFieldHeight(), j, rand() % 14);
-	    }
-	    else
-	    {
-      View::setChar(x, y + getInfoScoreFieldHeight(), j);
-	    }
-     break;
-   }
-   x++;
-  }
-  y++;
- }
-}
-
 bool Game::isColision(int x, int y)
 {
  unsigned char ch = map[y][x];
@@ -712,8 +705,8 @@ int Game::getReverseMod(int mode)
 
 void Game::checkFood()
 {
- int x = pacman->getPosition().x;
- int y = pacman->getPosition().y;
+ const int x = pacman->getPosition().x;
+ const int y = pacman->getPosition().y;
 
  const unsigned char food = static_cast<unsigned char> (250);
  const unsigned char fruitChar = static_cast<unsigned char> (253);
@@ -753,10 +746,10 @@ void Game::checkFood()
   {
    fruits.pop_back();
   }
-  printFruits();
+  printFruits(fruits);
   isFruitSetted = false;
  }
- printScore();
+ printScore(score);
 }
 
 void Game::setFruit()
@@ -767,7 +760,7 @@ void Game::setFruit()
  int y = getFruitY();
  
  map[y][x] = fruitChar;
- View::setChar(x, y + getInfoScoreFieldHeight(), fruitChar, fruit);
+ printFruit(x, y + getInfoScoreFieldHeight(), fruit);
 
  isFruitSetted = true;
 }
@@ -780,8 +773,8 @@ void Game::checkDeath()
   bool isColisionY = (pacman->getPosition().y == ghosts[i]->getPosition().y);
   if (isColisionX && isColisionY)
   {
-   bool isDanger = (ghosts[i]->getMode() == getModeScatter());
-   isDanger = (isDanger || (ghosts[i]->getMode() == getModeChase()));
+   bool isDanger = (ghosts[i]->getMode() == getModeScatter() || 
+    (ghosts[i]->getMode() == getModeChase()));
    if (isDanger)
    {
     death();
@@ -790,47 +783,26 @@ void Game::checkDeath()
    {
     combo *= 2;
     score += combo;
-    printCombo();
-    printGhost(ghosts[i]);
+    printCombo(*pacman, map, combo);
+    printGhost(*ghosts[i], false, fruit, map);
     ghosts[i]->setMode(getModeDead());
    }
   }
  }
- printCountOfLives();
+ printCountOfLives(pacman->getLivesCount());
 }
 
 void Game::death()
 {
  pacman->death();
  
- unsigned char ch = static_cast<unsigned char> (219);
+ paintPlayingField(getColorBlack());
+ 
+ printCountOfLives(pacman->getLivesCount());
+ Sleep(200);
 
- for (int x = 0; x < getPlayingFieldWidth(); x++)
- {
-  for (int y = 0; y < getPlayingFieldHeight(); y++)
-  {
-   View::setChar(x, y + getInfoScoreFieldHeight(), ch, getColorBlack());
-   Sleep(1);
-  }
- }
- int x = getPlayingFieldWidth() / 2;
- int y = (getPlayingFieldHeight() / 2) + getInfoScoreFieldHeight();
+ printDyingPacman();
 
- ch = static_cast<unsigned char> (250);
-
- View::setChar(x, y, '<', getColorYellow());
- Sleep(200);
- View::setChar(x, y, 'v', getColorYellow());
- Sleep(200);
- View::setChar(x, y, '>', getColorYellow());
- Sleep(200);
- View::setChar(x, y, '^', getColorYellow());
- Sleep(200);
- View::setChar(x, y, ch, getColorYellow());
- Sleep(200);
- View::setChar(x, y);
- printCountOfLives();
- Sleep(200);
  if (pacman->getLivesCount() == 0)
  {
   Sleep(500);
@@ -844,231 +816,19 @@ void Game::death()
  waveCount = 0;
  waveTime = 0;
 
- printMap();
+ printMap(map);
  pacman->setPosition(getStartX(), getStartY());
  pacman->setDirection(getDirectionLeft());
  for (int i = 0; i < getCountOfGhosts(); i++)
  {
   ghosts[i]->setStartPosition();
-  printGhost(ghosts[i]);
+  printGhost(*ghosts[i], false, fruit, map);
  }
- printPacman(true);
+ printPacman(*pacman, true);
 
  printReady(true);
  Sleep(2500);
  printReady(false);
-}
-
-void Game::printOneUp(bool hide)
-{
- isOneUp = !isOneUp;
- char text[5] = "1 UP";
-
- for (int i = 0; i < 4; i++)
- {
-  if (hide)
-  {
-   View::setChar(3 + i, 0);
-  }
-  else
-  {
-   View::setChar(3 + i, 0, text[i], getColorWhite());
-  }
- }
-}
-
-void Game::printHightScore()
-{
- std::string text = "HIGHT SCORE : ";
- std::string highScore = "0";
-
- std::ifstream fin("hightScr.bin", std::ios_base::binary);
- if (fin.is_open())
- {
-  fin >> highScore;
- }
-  
- this->hightScore = std::stoi(highScore);
- text += highScore;
-
- for (unsigned int i = 0; i < text.length(); i++)
- {
-  View::setChar(i + 3, 1, text[i], getColorWhite());
- }
-}
-
-void Game::printScore()
-{
- std::string text = "SCORE : ";
- text += std::to_string(score);
-
- for (unsigned int i = 0; i < text.length(); i++)
- {
-  View::setChar(i + 9, 2, text[i], getColorWhite());
- }
-}
-
-void Game::printCountOfLives()
-{
- int height = getInfoScoreFieldHeight();
- height += getPlayingFieldHeight();
- char heart = static_cast<unsigned char> (254);
-
- for (int i = 0; i < pacman->getLivesCount(); i++)
- {
-  View::setChar(i + 2, height, heart, getColorRed());
- }
- for (int i = pacman->getLivesCount(); i < 3; i++)
- {
-  View::setChar(i + 2, height);
- }
-}
-
-void Game::printFruits()
-{
- unsigned char fruitChar = static_cast<unsigned char> (253);
- for (unsigned int i = 0; i < fruits.size(); i++)
- {
-  int x = getPlayingFieldWidth() - 2 - i;
-  int y = getInfoScoreFieldHeight() + getPlayingFieldHeight();
-  View::setChar(x, y, fruitChar, fruits[i]);
- }
-}
-
-void Game::printReady(bool show)
-{
- char text[6] = "READY";
-
- int y = getInfoScoreFieldHeight() + 17;
-
- for (int i = 0; i < 5; i++)
- {
-  if (show)
-  {
-   View::setChar(i + 11, y, text[i], getColorWhite());
-  }
-  else
-  {
-   View::setChar(i + 11, y);
-  }
- }
-}
-
-void Game::printPause(bool show)
-{
- char text[6] = "Pause";
- int width = getPlayingFieldWidth() - 5;
- int color = getColorBlack();
- if (show)
- {
-  color = getColorRed();
- }
-
- for (int i = 0; i < 5; i++)
- {
-  View::setChar(width + i, 0, text[i], color);
- }
-}
-
-void Game::printGhost(Ghost* current, bool isWarning)
-{
- int x = current->getOldPosition().x;
- int y = current->getOldPosition().y;
- unsigned char ch = map[y][x];
- unsigned char food = static_cast<unsigned char> (250);
-
- bool isFood = (ch == food || ch == 'o' || ch == '-');
-
- int color = isFood ? getColorWhite() : fruit;
-
- View::setChar(x, y + getInfoScoreFieldHeight(), ch, color);
-
- ch = current->getCharacter();
- color = current->getColor();
- if (isWarning)
-  color = getColorWhite();
- x = current->getPosition().x;
- y = current->getPosition().y;
- View::setChar(x, y + getInfoScoreFieldHeight(), ch, color);
-}
-
-void Game::printCombo()
-{
- int x = pacman->getPosition().x;
- int y = pacman->getPosition().y;
- int height = y + getInfoScoreFieldHeight();
-
- std::string text = std::to_string(combo);
-
- x -= (text.length() / 2);
-
- if (x < 0)
-  x = 0;
- else if ((x + text.length()) >= getPlayingFieldWidth())
-  x = (getPlayingFieldWidth() - 1 - text.length());
- 
- for (unsigned int i = 0; i < text.length(); i++)
- {  
-  View::setChar(x + i, height, text[i], getColorCyan());
- }
-
- Sleep(500);
-
- for (unsigned int i = 0; i < text.length(); i++)
- {
-  View::setChar(x + i, height, map[y][x + i]);
- }
-}
-
-void Game::printPacman(bool show)
-{
- char ch = pacman->getCurrentCharacter();
- int color = pacman->getColor();
- if (show)
- {
-  int x = pacman->getPosition().x;
-  int y = pacman->getPosition().y + getInfoScoreFieldHeight();
-  View::setChar(x, y, ch, color);
- }
- else
- {
-  int x = pacman->getOldPosition().x;
-  int y = pacman->getOldPosition().y + getInfoScoreFieldHeight();
-  View::setChar(x, y);
- }
-}
-
-void Game::printGameOver()
-{
- printCountOfLives();
- char text[10] = "GAME OVER";
-
- int y = getInfoScoreFieldHeight() + 17;
-
- for (int i = 0; i < 9; i++)
- {
-  View::setChar(i + 9, y, text[i], getColorWhite());
- }
-}
-
-void Game::printFPS(float deltaTime)
-{
- fpsTime += deltaTime;
- fpsCount++;
- if (fpsTime > 1)
- {
-  std::string text = "FPS : ";
-  text += std::to_string(fpsCount);
-
-  for (unsigned int i = 0; i < text.length(); i++)
-  {
-   View::setChar(i + 9, 0, text[i], getColorWhite());
-
-  }
-
-  fpsCount = 0;
-  fpsTime = 0;
- }
 }
 
 Position Game::moveToDirection()

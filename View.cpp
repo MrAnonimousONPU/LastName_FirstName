@@ -1,5 +1,13 @@
 #include "View.h"
 
+void View::SetWindowTitle()
+{
+ TCHAR name[7] = (__TEXT("Pacman"));
+ int height = getInfoLivesFieldHeight();
+ height += getPlayingFieldHeight() + getInfoScoreFieldHeight();
+ SetConsoleTitle(name);
+}
+
 void View::setChar(int x, int y, char ch, int color)
 {
  setColor(color);
