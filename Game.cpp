@@ -1,72 +1,53 @@
 ﻿#include "Game.h"
 
 Game::Game() : Draw(),
- isWinner(false), isOneUp(false), isPause(false),
- isFruitSetted(false), warning(false),
+ isPause(false),
+ isWinner(false), 
+ isOneUp(false),
+ isFruitSetted(false), 
+ warning(false),
 
-amountOfFood(0), score(0), combo(100), level(1), waveCount(0),
-waveMod(getModeScatter()), blinky(0),
+ waveCount(0),
+ waveMod(getModeScatter()),
+ amountOfFood(0), 
+ score(0), 
+ combo(100), 
+ level(1), 
+ blinky(0),
 
-warningTime(0), frightenedMoveTime(0), 
-deadGhostMoveTime(0), unitMoveTime(0), winTime(0), spawnFruitTime(0), 
-superTime(0), checkWaitTime(0), waveTime(0),
+ waveTime(0),
+ unitMoveTime(0),
+ deadGhostMoveTime(0),
+ frightenedMoveTime(0),
+ winTime(0),
+ spawnFruitTime(0),
+ superTime(0),
+ warningTime(0),
+ checkWaitTime(0),
 
-unitMoveTimer(0.15f), deadGhostMoveTimer(0.05f), frightenedMoveTimer(0.3f),
-winTimer(1.0f), spawnFruitTimer(60.0f), superTimer(10.0f), warningTimer(0.2f),
-waveTimer(7.0f)
+ superTimer(10.0f),
+ waveTimer(7.0f),
+ unitMoveTimer(0.15f), 
+ deadGhostMoveTimer(0.05f), 
+ frightenedMoveTimer(0.3f),
+ winTimer(1.0f), 
+ spawnFruitTimer(60.0f), 
+ warningTimer(0.2f)
 {
  srand(time(static_cast<unsigned int> (0)));
  pacman = new Player(getStartX(), getStartY());
  initMap();
  initHightScore();
- /*
- map = {
-  "╔══════════════════════════╗",
-  "║............││............║",
-  "║.┌──┐.┌───┐.││.┌───┐.┌──┐.║",
-  "║o│  │.│   │.││.│   │.│  │o║",
-  "║.└──┘.└───┘.└┘.└───┘.└──┘.║",
-  "║..........................║",
-  "║.┌──┐.┌┐.┌──────┐.┌┐.┌──┐.║",
-  "║.└──┘.││.└──┐┌──┘.││.└──┘.║",
-  "║......││....││....││......║",
-  "╚════╗.│└──┐ ││ ┌──┘│.╔════╝",
-  "     ║.│┌──┘ └┘ └──┐│.║     ",
-  "     ║.││          ││.║     ",
-  "     ║.││ ╔══--══╗ ││.║     ",
-  "═════╝.└┘ ║      ║ └┘.╚═════",
-  "      .   ║      ║   .      ",
-  "═════╗.┌┐ ║      ║ ┌┐.╔═════",
-  "     ║.││ ╚══════╝ ││.║     ",
-  "     ║.││          ││.║     ",
-  "     ║.││ ┌──────┐ ││.║     ",
-  "╔════╝.└┘ └──┐┌──┘ └┘.╚════╗",
-  "║............││............║",
-  "║.┌──┐.┌───┐.││.┌───┐.┌──┐.║",
-  "║.└─┐│.└───┘.└┘.└───┘.│┌─┘.║",
-  "║o..││.......  .......││..o║",
-  "║─┐.││.┌┐.┌──────┐.┌┐.││.┌─║",
-  "║─┘.└┘.││.└──┐┌──┘.││.└┘.└─║",
-  "║......││....││....││......║",
-  "║.┌────┘└──┐.││.┌──┘└────┐.║",
-  "║.└────────┘.└┘.└────────┘.║",
-  "║..........................║",
-  "╚══════════════════════════╝",
- };
- */
 
- ghosts[0] = new Ghost(getStartXBlinky(), getStartYBlinky(), 
- getGhostBlinky(),map);
+ ghosts[0] = new Blinky(getStartXBlinky(), getStartYBlinky(), map, *pacman);
 
 
- ghosts[1] = new Ghost(getStartXPinky(), getStartYPinky(),
- getGhostPinky(), map);
+ ghosts[1] = new Pinky(getStartXPinky(), getStartYPinky(), map, *pacman);
 
- ghosts[2] = new Ghost(getStartXInky(), getStartYInky(),
- getGhostInky(), map);
+ ghosts[2] = new Inky(getStartXInky(), getStartYInky(),
+  map, *pacman, *ghosts[blinky]);
 
- ghosts[3] = new Ghost(getStartXClyde(), getStartYClyde(),
- getGhostClyde(), map);
+ ghosts[3] = new Clyde(getStartXClyde(), getStartYClyde(), map, *pacman);
 }
 
 Game::~Game()
@@ -232,8 +213,8 @@ void Game::keyPressed(unsigned char ch)
  }
  ch = std::toupper(ch);
 
- int x = pacman->getPosition().x;
- int y = pacman->getPosition().y;
+ int x = pacman->getPosition().getX();
+ int y = pacman->getPosition().getY();
 
  if ('P' == ch)
  {
@@ -439,7 +420,7 @@ void Game::gameWin()
 
  for (int i = 0; i < getCountOfGhosts(); i++)
  {
-  ghosts[i]->setStartPosition();
+  ghosts[i]->toStartPosition();
   printGhost(*ghosts[i], false, fruit, map);
  }
  printPacman(*pacman, true);
@@ -498,8 +479,8 @@ void Game::releaseGhosts()
 
 void Game::movePlayer()
 {
- Position pos = moveToDirection();
- if (!isColision(pos.x, pos.y))
+ Position temp = pacman->getPosition() + pacman->getDirection();
+ if (!isColision(temp.getX(), temp.getY()))
  {
   pacman->move();
   printPacman(*pacman, false);
@@ -517,22 +498,8 @@ void Game::moveNormalGhosts()
   ghosts[i]->getMode() == getModeFrightened()));
   if (isNormal)
   {
-   if (ghosts[i]->getType() == getGhostBlinky())
-   {
-    ghosts[i]->move(pacman->getPosition().x, pacman->getPosition().y);
-   }
-   else if (ghosts[i]->getType() == getGhostPinky())
-   {
-    moveGhostPinky(ghosts[i]);
-   }
-   else if (ghosts[i]->getType() == getGhostInky())
-   {
-    moveGhostInky(ghosts[i]);
-   }
-   else if (ghosts[i]->getType() == getGhostClyde())
-   {
-    moveGhostClyde(ghosts[i]);
-   }
+   ghosts[i]->makeMove();
+
    printGhost(*ghosts[i], false, fruit, map);
    printPacman(*pacman, true);
    checkDeath();
@@ -546,60 +513,11 @@ void Game::moveAbnormalGhosts(int mode)
  {
   if (mode == ghosts[i]->getMode())
   {
-   ghosts[i]->move(0, 0);
+   ghosts[i]->makeMove();
    printGhost(*ghosts[i], false, fruit, map);
    printPacman(*pacman, true);
+   checkDeath();
   }
- }
-}
-
-void Game::moveGhostPinky(Ghost* ghost)
-{
- const int direction = pacman->getDirection();
- int x = pacman->getPosition().x;
- int y = pacman->getPosition().y;
-
- bool isHorisontal = (direction == getDirectionLeft());
- isHorisontal = (isHorisontal || direction == getDirectionRight());
-
- if (isHorisontal)
- {
-  x += direction == getDirectionLeft() ? -4 : 4;
- }
- else
- {
-  y += direction == getDirectionUp() ? -4 : 4;
- }
-
- ghost->move(x, y);
-}
-
-void Game::moveGhostInky(Ghost* ghost)
-{
- int x = pacman->getPosition().x - ghosts[blinky]->getPosition().x;
- int y = pacman->getPosition().y - ghosts[blinky]->getPosition().y;
- x = ghosts[blinky]->getPosition().x + (x * 2);
- y = ghosts[blinky]->getPosition().y + (y * 2);
-
- ghost->move(x, y);
-}
-
-void Game::moveGhostClyde(Ghost* ghost)
-{
- int x = ghost->getPosition().x;
- int y = ghost->getPosition().y;
- int pacX = pacman->getPosition().x;
- int pacY = pacman->getPosition().y;
- double distance = sqrt(pow((x - pacX), 2) + pow((y - pacY), 2));
- if (distance > 8)
- {
-  ghost->move(pacX, pacY);
- }
- else
- {
-  x = ghost->getScatterPosition().x;
-  y = ghost->getScatterPosition().y;
-  ghost->move(x, y);
  }
 }
 
@@ -705,8 +623,8 @@ int Game::getReverseMod(int mode)
 
 void Game::checkFood()
 {
- const int x = pacman->getPosition().x;
- const int y = pacman->getPosition().y;
+ const int x = pacman->getPosition().getX();
+ const int y = pacman->getPosition().getY();
 
  const unsigned char food = static_cast<unsigned char> (250);
  const unsigned char fruitChar = static_cast<unsigned char> (253);
@@ -769,9 +687,7 @@ void Game::checkDeath()
 {
  for (int i = 0; i < getCountOfGhosts(); i++)
  {
-  bool isColisionX = (pacman->getPosition().x == ghosts[i]->getPosition().x);
-  bool isColisionY = (pacman->getPosition().y == ghosts[i]->getPosition().y);
-  if (isColisionX && isColisionY)
+  if (pacman->getPosition() == ghosts[i]->getPosition())
   {
    bool isDanger = (ghosts[i]->getMode() == getModeScatter() || 
     (ghosts[i]->getMode() == getModeChase()));
@@ -821,7 +737,7 @@ void Game::death()
  pacman->setDirection(getDirectionLeft());
  for (int i = 0; i < getCountOfGhosts(); i++)
  {
-  ghosts[i]->setStartPosition();
+  ghosts[i]->toStartPosition();
   printGhost(*ghosts[i], false, fruit, map);
  }
  printPacman(*pacman, true);
@@ -829,25 +745,4 @@ void Game::death()
  printReady(true);
  Sleep(2500);
  printReady(false);
-}
-
-Position Game::moveToDirection()
-{
- Position pos = pacman->getPosition();
- int direction = pacman->getDirection();
- bool isHorisontal = (direction == getDirectionLeft() || 
- direction == getDirectionRight());
-
- if (isHorisontal)
- {
-  pos.x += direction == getDirectionLeft() ? -1 : 1;
-  if (pos.x == getPlayingFieldWidth())
-   pos.x = 0;
-  else if (pos.x == -1)
-   pos.x = getPlayingFieldWidth() - 1;
- }
- else
-  pos.y += direction == getDirectionUp() ? -1 : 1;
-
- return pos;
 }

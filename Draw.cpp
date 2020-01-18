@@ -152,8 +152,8 @@ void Draw::printPause(bool show)
 void Draw::printGhost(const Ghost& current, bool isWarning,
  int fruit, const std::vector<std::string>& map)
 {
- int x = current.getOldPosition().x;
- int y = current.getOldPosition().y;
+ int x = current.getOldPosition().getX();
+ int y = current.getOldPosition().getY();
  unsigned char ch = map[y][x];
  unsigned char food = static_cast<unsigned char> (250);
 
@@ -167,17 +167,17 @@ void Draw::printGhost(const Ghost& current, bool isWarning,
  color = current.getColor();
  if (isWarning)
   color = getColorWhite();
- x = current.getPosition().x;
- y = current.getPosition().y;
+ x = current.getPosition().getX();
+ y = current.getPosition().getY();
  setChar(x, y + getInfoScoreFieldHeight(), ch, color);
 }
 
 void Draw::printCombo(const Player& pacman, const std::vector<std::string>& map,
   int combo)
 {
- unsigned int x = pacman.getPosition().x;
- unsigned int y = pacman.getPosition().y;
- unsigned int height = y + getInfoScoreFieldHeight();
+ int x = pacman.getPosition().getX();
+ int y = pacman.getPosition().getY();
+ int height = y + getInfoScoreFieldHeight();
 
  std::string text = std::to_string(combo);
 
@@ -185,7 +185,7 @@ void Draw::printCombo(const Player& pacman, const std::vector<std::string>& map,
 
  if (x < 0)
   x = 0;
- else if ((x + text.length()) >= getPlayingFieldWidth())
+ else if ((text.length() + x) >= getPlayingFieldWidth())
   x = (getPlayingFieldWidth() - 1 - text.length());
 
  for (unsigned int i = 0; i < text.length(); i++)
@@ -207,14 +207,14 @@ void Draw::printPacman(const Player& pacman, bool show)
  int color = pacman.getColor();
  if (show)
  {
-  int x = pacman.getPosition().x;
-  int y = pacman.getPosition().y + getInfoScoreFieldHeight();
+  int x = pacman.getPosition().getX();
+  int y = pacman.getPosition().getY() + getInfoScoreFieldHeight();
   setChar(x, y, ch, color);
  }
  else
  {
-  int x = pacman.getOldPosition().x;
-  int y = pacman.getOldPosition().y + getInfoScoreFieldHeight();
+  int x = pacman.getOldPosition().getX();
+  int y = pacman.getOldPosition().getY() + getInfoScoreFieldHeight();
   setChar(x, y);
  }
 }

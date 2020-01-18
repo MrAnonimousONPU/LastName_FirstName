@@ -1,8 +1,13 @@
 #include "Player.h"
 
-Player::Player(int x, int y): 
-lives(getMaxNumLives()), color(getColorYellow()), currentPos{x, y}, oldPos{x, y},
-direction(getDirectionLeft()), super(false), characters{'v', '^', '<', '>'}
+Player::Player(int x, int y) : 
+ lives(getMaxNumLives()),
+ color(getColorYellow()),
+ characters{ 'v', '^', '<', '>' },
+ super(false),
+ currentPos(x, y),
+ oldPos(x, y),
+ direction(getDirectionLeft()) 
 {
 }
 
@@ -10,26 +15,14 @@ void Player::move()
 {
  oldPos = currentPos;
 
- bool isHorisontal = (direction == getDirectionLeft());
- isHorisontal = (isHorisontal || direction == getDirectionRight());
-
- if (isHorisontal)
- {
-  currentPos.x += direction == getDirectionLeft() ? -1 : 1;
-  if (currentPos.x == getPlayingFieldWidth())
-   currentPos.x = 0;
-  else if (currentPos.x == -1)
-   currentPos.x = getPlayingFieldWidth() - 1;
- }
- else
-  currentPos.y += direction == getDirectionUp() ? -1 : 1;
+ currentPos += direction;
 }
 
 void Player::setPosition(int x, int y)
 {
  oldPos = currentPos;
-	currentPos.x = x;
-	currentPos.y = y;
+	currentPos.setX(x);
+	currentPos.setY(y);
 	direction = (getDirectionLeft());
 }
 
@@ -38,7 +31,7 @@ void Player::death()
  lives--;
 }
 
-void Player::setDirection(int direction)
+void Player::setDirection(const Position& direction)
 {
  this->direction = direction;
 }
@@ -65,10 +58,17 @@ int Player::getColor() const
 
 int Player::getCurrentCharacter() const
 {
- return characters[direction];
+ if (direction.getY() == -1)
+  return characters[0];
+ else if (direction.getY() == 1)
+  return characters[1];
+ else if (direction.getX() == 1)
+  return characters[2];
+ else
+  return characters[3];
 }
 
-int Player::getDirection() const
+const Position& Player::getDirection() const
 {
  return direction;
 }

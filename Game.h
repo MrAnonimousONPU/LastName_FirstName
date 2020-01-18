@@ -16,6 +16,10 @@
 
 #include "Player.h"
 #include "Ghost.h"
+#include "Blinky.h"
+#include "Pinky.h"
+#include "Inky.h"
+#include "Clyde.h"
 #include "Draw.h"
 
 class Game : Draw
@@ -47,9 +51,6 @@ private:
  void movePlayer();
  void moveNormalGhosts();
  void moveAbnormalGhosts(int mode);
- void moveGhostPinky(Ghost* ghost);
- void moveGhostInky(Ghost* ghost);
- void moveGhostClyde(Ghost* ghost);
 
  void warnPlayer();
  void setSuper(bool super);
@@ -92,8 +93,6 @@ private:
  const float winTimer;
  const float spawnFruitTimer;
  const float warningTimer;
-
- Position moveToDirection();
 
  std::vector<std::string> map;
  Ghost* ghosts[4];

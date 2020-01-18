@@ -1,45 +1,14 @@
 #include "Ghost.h"
 
-Ghost::Ghost(int x, int y, int typeGhost, const std::vector<std::string>& map) :
- map(map), pos({x, y}), oldPos({x, y}), character('M'),
- direction(getDirectionLeft()), oldDirection(direction), typeGhost(typeGhost)
+Ghost::Ghost(int x, int y, const std::vector<std::string>& map) :
+ character('M'),
+ oldMode(getModeDead()),
+ pos(x, y),
+ oldPos(x, y),
+ direction(getDirectionLeft()),
+ oldDirection(direction),
+ map(map)
 {
- if (typeGhost == getGhostBlinky())
- {
-  cagePos = {12, 15};
-  scatterPos = {0, getPlayingFieldWidth() - 1};
-  mode = getModeChase();
-  startMode = mode;
-  oldMode = mode;
-  color = getColorRed();
- }
- else if (typeGhost == getGhostPinky())
- {
-  cagePos = {15, 15};
-  scatterPos = {0, 0};
-  mode = getModeWait();
-  startMode = mode;
-  oldMode = mode;
-  color = getColorPink();
- }
- else if (typeGhost == getGhostInky())
- {
-  cagePos = {12, 13};
-  scatterPos = {getPlayingFieldHeight() - 1, getPlayingFieldWidth() - 1};
-  mode = getModeWait();
-  startMode = mode;
-  oldMode = mode;
-  color = getColorCyan();
- }
- else
- {
-  mode = getModeWait();
-  startMode = mode;
-  oldMode = mode;
-  cagePos = {15, 13};
-  scatterPos = {getPlayingFieldHeight() - 1, 0};
-  color = getColorOrange();
- }
  startPos = { x, y };
  specificX[0] = 12;
  specificX[1] = 15;
@@ -47,90 +16,23 @@ Ghost::Ghost(int x, int y, int typeGhost, const std::vector<std::string>& map) :
  specificY[1] = 11;
 }
 
-void Ghost::move(int playerX, int playerY)
+void Ghost::makeMove()
 {
- if (mode == getModeScatter())
- {
-  playerX = scatterPos.x;
-  playerY = scatterPos.y;
- }
- else if (mode == getModeFrightened())
+ Position target = getTargetPos();
+ 
+ upToMode(target);
+
+ std::vector<Position> directions;
+ aviableDirections(directions);
+
+ chooseBestDirection(target, directions);
+
+ if (mode == getModeFrightened())
  {
   if (oldMode != mode)
   {
    oldMode = mode;
-   setDirection(reverseDirection(direction));
-   changePosition();
-   return;
-  }
- }
- else if (mode == getModeDead())
- {
-  if (pos.x == cagePos.x && pos.y == cagePos.y)
-  {
-   oldMode = mode;
-   mode = getModeExiting();
-  }
-  playerX = cagePos.x;
-  playerY = cagePos.y;
- }
- else if (mode == getModeExiting())
- {
-  if (pos.x == getGateX() && pos.y == getGateY() - 1)
-  {
-   oldMode = mode;
-   mode = getModeChase();
-  }
-  playerX = getGateX();
-  playerY = getGateY() - 1;
- }
- else if (mode == getModeWait())
- {
-  oldPos = pos;
-  if (pos.x == cagePos.x && pos.y == cagePos.y)
-  {
-   pos.x--;
-   return;
-  }
-  pos.x++;
-  return;
- }
-
- std::vector<int> directions;
- aviableDirections(directions);
-
- if (directions.size() > 1)
- {
-  if(mode == getModeFrightened())
-  {
-   directions[0] = directions[rand() % directions.size()];
-  }
-  else
-  {
-   double minDistance = std::numeric_limits<double>::infinity();
-   for (unsigned int i = 0; i < directions.size(); i++)
-   {
-    int x = pos.x;
-    int y = pos.y;
-
-    bool isHorisontal = (directions[i] == getDirectionLeft());
-    isHorisontal = (isHorisontal || directions[i] == getDirectionRight());
-    if (isHorisontal)
-    {
-     x += directions[i] == getDirectionLeft() ? -1 : 1;
-    }
-    else
-    {
-     y += directions[i] == getDirectionUp() ? -1 : 1;
-    }
-
-	double distance = sqrt(pow((x - playerX), 2) + pow((y - playerY), 2));
-	if (distance < minDistance)
-	{
-     minDistance = distance;
-	 directions[0] = directions[i];
-	}
-   }
+   directions[0] = reverseDirection(direction);
   }
  }
 
@@ -143,17 +45,17 @@ void Ghost::move(int playerX, int playerY)
 void Ghost::setPosition(int x, int y)
 {
  oldPos = pos;
- pos.x = x;
- pos.y = y;
+ pos.setX(x);
+ pos.setY(y);
 }
 
-void Ghost::setStartPosition()
+void Ghost::toStartPosition()
 {
  pos = startPos;
  mode = startMode;
 }
 
-void Ghost::setDirection(int direction)
+void Ghost::setDirection(Position direction)
 {
  oldDirection = this->direction;
  this->direction = direction;
@@ -208,79 +110,172 @@ const Position& Ghost::getScatterPosition() const
  return scatterPos;
 }
 
-void Ghost::aviableDirections(std::vector<int>& directions)
+Ghost::~Ghost()
 {
- int upDir = getDirectionUp();
- bool directionNotReverse = (direction != reverseDirection(upDir));
- if (!checkColision(pos.x, pos.y - 1) && directionNotReverse)
+}
+
+void Ghost::setCagePos(const Position& temp)
+{
+ cagePos = temp;
+}
+
+void Ghost::setScatterPos(const Position& temp)
+{
+ scatterPos = temp;
+}
+
+void Ghost::setStartMode(int mode)
+{
+ startMode = mode;
+}
+
+void Ghost::setColor(int color)
+{
+ this->color = color;
+}
+
+void Ghost::setTypeGhost(int ghost)
+{
+ typeGhost = ghost;
+}
+
+void Ghost::aviableDirections(std::vector<Position>& directions)
+{
+ Position dir = getDirectionUp();
+ bool directionNotReverse = (direction != reverseDirection(dir));
+ if (!checkColision(pos + dir) && directionNotReverse)
   if (mode != getModeFrightened())
   {
-   if (!isSpecific(pos.x, pos.y))
-    directions.push_back(getDirectionUp());
+   if (!isSpecific(pos.getX(), pos.getY()))
+   {
+    directions.push_back(dir);
+   }
   }
   else
-   directions.push_back(getDirectionUp());
+  {
+   directions.push_back(dir);
+  }
 
- directionNotReverse = (direction != reverseDirection(getDirectionLeft()));
- if (!checkColision(pos.x - 1, pos.y) && directionNotReverse)
-  directions.push_back(getDirectionLeft());
+ dir = getDirectionLeft();
+ checkDirection(dir, directions);
 
- directionNotReverse = (direction != reverseDirection(getDirectionDown()));
- if (!checkColision(pos.x, pos.y + 1) && directionNotReverse)
-  directions.push_back(getDirectionDown());
+ dir = getDirectionDown();
+ checkDirection(dir, directions);
 
- directionNotReverse = (direction != reverseDirection(getDirectionRight()));
- if (!checkColision(pos.x + 1, pos.y) && directionNotReverse)
-  directions.push_back(getDirectionRight());
+ dir = getDirectionRight();
+ checkDirection(dir, directions);
+}
+
+void Ghost::checkDirection(Position& dir, std::vector<Position>& directions)
+{
+ bool directionNotReverse = (direction != reverseDirection(dir));
+ if (!checkColision(pos + dir) && directionNotReverse)
+ {
+  directions.push_back(dir);
+ }
 }
 
 void Ghost::changePosition()
 {
  oldPos = pos;
 
- bool isHorisontal = (direction == getDirectionLeft());
- isHorisontal = (isHorisontal || direction == getDirectionRight());
+ pos += direction;
+}
 
- if (isHorisontal)
+void Ghost::upToMode(Position& target)
+{
+ if (mode == getModeScatter())
  {
-  pos.x += direction == getDirectionLeft() ? -1 : 1;
-  if (pos.x == getPlayingFieldWidth())
-   pos.x = 0;
-  else if (pos.x == -1)
-   pos.x = getPlayingFieldWidth() - 1;
+  target = scatterPos;
  }
- else
-  pos.y += direction == getDirectionUp() ? -1 : 1;
+ else if (mode == getModeDead())
+ {
+  if (pos == cagePos)
+  {
+   oldMode = mode;
+   mode = getModeExiting();
+  }
+  target = cagePos;
+ }
+ else if (mode == getModeExiting())
+ {
+  if (pos.getX() == getGateX() && pos.getY() == getGateY() - 1)
+  {
+   oldMode = mode;
+   mode = getModeChase();
+  }
+  target.setX(getGateX());
+  target.setY(getGateY() - 1);
+ }
+ else if (mode == getModeWait())
+ {
+  oldPos = pos;
+  if (pos == cagePos)
+  {
+   target = (pos + getDirectionLeft());
+  }
+  target = (pos + getDirectionRight());
+ }
 }
 
-int Ghost::reverseDirection(int direction)
+void Ghost::chooseBestDirection(Position& target, 
+ std::vector<Position>& directions)
 {
- if (direction == getDirectionDown())
-  return getDirectionUp();
- else if (direction == getDirectionUp())
-  return getDirectionDown();
- else if (direction == getDirectionLeft())
-  return getDirectionRight();
- else
-  return getDirectionLeft();
+ if (directions.size() > 1)
+ {
+  if (mode == getModeFrightened())
+  {
+   directions[0] = directions[rand() % directions.size()];
+  }
+  else
+  {
+   double minDistance = std::numeric_limits<double>::infinity();
+   for (unsigned int i = 0; i < directions.size(); i++)
+   {
+    Position temp = pos + directions[i];
+
+    double distance = temp - target;
+    if (distance < minDistance)
+    {
+     minDistance = distance;
+     directions[0] = directions[i];
+    }
+   }
+  }
+ }
 }
 
-bool Ghost::checkColision(int x, int y)
+Position Ghost::reverseDirection(const Position& direction)
 {
- if (x == getPlayingFieldWidth())
-  x = 0;
- else if (x == -1)
-  x = getPlayingFieldWidth() - 1;
+ Position temp = direction;
+ if (direction.getY() == -1)
+  temp.setY(1);
+ else if (direction.getY() == 1)
+  temp.setY(-1);
+ else if (direction.getX() == 1)
+  temp.setX(-1);
+ else
+  temp.setX(1);
 
- unsigned char ch = map[y][x];
+ return temp;
+}
+
+bool Ghost::checkColision(Position point)
+{
+ if (point.getX() == getPlayingFieldWidth())
+  point.setX(0);
+ else if (point.getX() == -1)
+  point.setX(getPlayingFieldWidth() - 1);
+
+ unsigned char ch = map[point.getY()][point.getX()];
  unsigned char food = static_cast<unsigned char> (250);
  unsigned char fruitChar = static_cast<unsigned char> (253);
 
- bool isGate = (x == getGateX() && y == getGateY());
- isGate = (isGate && (mode == getModeDead() || mode == getModeExiting()));
+ bool isGate = ((mode == getModeDead() || mode == getModeExiting()) && ch == '-');
 
  bool isCanGo = (ch == ' ' || ch == food || ch == 'o'
  || ch == fruitChar || isGate);
+
  bool hasColision = (!isCanGo);
 
  return hasColision;

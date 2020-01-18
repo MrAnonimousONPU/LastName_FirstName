@@ -13,21 +13,20 @@ public:
  void setPosition(int x, int y);
  void death();
 
- void setDirection(int direction);
+ void setDirection(const Position& direction);
  void setSuper(bool super);
 
  bool isSuper() const;
  int getLivesCount() const;
  int getColor() const;
  int getCurrentCharacter() const;
- int getDirection() const;
+ const Position& getDirection() const;
  const Position& getPosition() const;
  const Position& getOldPosition() const;
 
 private:
  int lives;
  int color;
- int direction;
 
  char characters[4];
 
@@ -35,6 +34,7 @@ private:
 
  Position currentPos;
  Position oldPos;
+ Position direction;
 };
 
 #endif

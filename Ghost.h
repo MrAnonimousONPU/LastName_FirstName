@@ -11,13 +11,13 @@
 class Ghost
 {
 public:
- Ghost(int x, int y, int typeGhost,const std::vector<std::string>& map);
+ Ghost(int x, int y, const std::vector<std::string>& map);
 
- void move(int playerX, int playerY);
+ void makeMove();
 
+ void toStartPosition();
  void setPosition(int x, int y);
- void setStartPosition();
- void setDirection(int direction);
+ void setDirection(Position direction);
  void setMode(int mode);
 
  int getColor() const;
@@ -28,30 +28,45 @@ public:
  const Position& getOldPosition() const;
  const Position& getScatterPosition() const;
 
-private:
- int color;
- int direction;
- int oldDirection;
- int mode;
- int oldMode;
- int typeGhost;
- int startMode;
+ virtual ~Ghost();
 
+protected:
+ virtual Position getTargetPos() = 0;
+
+ void setCagePos(const Position& temp);
+ void setScatterPos(const Position& temp);
+ void setStartMode(int mode);
+ void setColor(int color);
+ void setTypeGhost(int ghost);
+
+private:
+ void aviableDirections(std::vector<Position>& directions);
+ void checkDirection(Position& dir, std::vector<Position>& directions);
+ void upToMode(Position& target);
+ void chooseBestDirection(Position& target, std::vector<Position>& directions);
+ void changePosition();
+
+ bool checkColision(Position point);
+ bool isSpecific(int x, int y);
+
+ Position reverseDirection(const Position& direction);
+
+private:
  char character;
+
+ int color;
+ int mode;
+ int typeGhost;
+ int oldMode;
+ int startMode;
 
  Position cagePos;
  Position scatterPos;
  Position pos;
  Position oldPos;
  Position startPos;
-
- void aviableDirections(std::vector<int>& directions);
- void changePosition();
-
- int reverseDirection(int direction);
-
- bool checkColision(int x, int y);
- bool isSpecific(int x, int y);
+ Position direction;
+ Position oldDirection;
 
  std::vector<std::string> map;
  int specificX[2];

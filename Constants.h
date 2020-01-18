@@ -1,6 +1,8 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
+#include "Position.h"
+
 int getColorBlack();
 int getColorBlue();
 int getColorCyan();
@@ -23,10 +25,10 @@ int getInfoLivesFieldHeight();
 int getPlayingFieldWidth();
 int getPlayingFieldHeight();
 
-int getDirectionUp();
-int getDirectionDown();
-int getDirectionRight();
-int getDirectionLeft();
+Position getDirectionUp();
+Position getDirectionDown();
+Position getDirectionRight();
+Position getDirectionLeft();
 
 int getFruitX();
 int getFruitY();

@@ -95,24 +95,24 @@ int getPlayingFieldHeight()
  return 31;
 }
 
-int getDirectionUp()
+Position getDirectionUp()
 {
- return 0;
+ return Position(0, -1);
 }
 
-int getDirectionDown()
+Position getDirectionDown()
 {
- return 1;
+ return Position(0, 1);
 }
 
-int getDirectionRight()
+Position getDirectionRight()
 {
- return 2;
+ return Position(1, 0);
 }
 
-int getDirectionLeft()
+Position getDirectionLeft()
 {
- return 3;
+ return Position(-1, 0);
 }
 
 int getFruitX()

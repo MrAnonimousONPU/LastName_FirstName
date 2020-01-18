@@ -13,6 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Исходные файлы\Ghosts">
+      <UniqueIdentifier>{48a76735-ce88-4388-91a4-daf2a241f7e5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\Ghosts">
+      <UniqueIdentifier>{b1c06b87-38f7-48fe-a8f5-caf378f12aee}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="LastName_FirstName.cpp">
@@ -30,11 +36,26 @@
     <ClCompile Include="Game.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="Ghost.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
     <ClCompile Include="Draw.cpp">
       <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="Position.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="Blinky.cpp">
+      <Filter>Исходные файлы\Ghosts</Filter>
+    </ClCompile>
+    <ClCompile Include="Pinky.cpp">
+      <Filter>Исходные файлы\Ghosts</Filter>
+    </ClCompile>
+    <ClCompile Include="Inky.cpp">
+      <Filter>Исходные файлы\Ghosts</Filter>
+    </ClCompile>
+    <ClCompile Include="Clyde.cpp">
+      <Filter>Исходные файлы\Ghosts</Filter>
+    </ClCompile>
+    <ClCompile Include="Ghost.cpp">
+      <Filter>Исходные файлы\Ghosts</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -50,14 +71,26 @@
     <ClInclude Include="Game.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="Ghost.h">
+    <ClInclude Include="Draw.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="Position.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="Draw.h">
-      <Filter>Файлы заголовков</Filter>
+    <ClInclude Include="Blinky.h">
+      <Filter>Файлы заголовков\Ghosts</Filter>
+    </ClInclude>
+    <ClInclude Include="Pinky.h">
+      <Filter>Файлы заголовков\Ghosts</Filter>
+    </ClInclude>
+    <ClInclude Include="Inky.h">
+      <Filter>Файлы заголовков\Ghosts</Filter>
+    </ClInclude>
+    <ClInclude Include="Clyde.h">
+      <Filter>Файлы заголовков\Ghosts</Filter>
+    </ClInclude>
+    <ClInclude Include="Ghost.h">
+      <Filter>Файлы заголовков\Ghosts</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
