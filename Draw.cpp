@@ -3,9 +3,10 @@
 Draw::Draw()
 {
  SetWindowTitle();
-
+ setFont();
  int height = getInfoLivesFieldHeight();
- height += getPlayingFieldHeight() + getInfoScoreFieldHeight(); 
+ height += getPlayingFieldHeight() + getInfoScoreFieldHeight();
+ setWidowPos(10, 0);
  setWindowSize(height, getPlayingFieldWidth());
 
  setCursorVisibility(false);
@@ -260,13 +261,10 @@ void Draw::printDyingPacman()
 void Draw::paintPlayingField(int color)
 {
  unsigned char ch = static_cast<unsigned char> (219);
-
- for (int x = 0; x < getPlayingFieldWidth(); x++)
+ 
+ std::string str(ch, getPlayingFieldWidth());
+ for (int y = 0; y < getPlayingFieldHeight(); y++)
  {
-  for (int y = 0; y < getPlayingFieldHeight(); y++)
-  {
-   setChar(x, y + getInfoScoreFieldHeight(), ch, color);
-   Sleep(1);
-  }
+ setString(0, y + getInfoScoreFieldHeight(), str, color);
  }
 }

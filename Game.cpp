@@ -1,6 +1,6 @@
 ﻿#include "Game.h"
 
-Game::Game() : Draw(),
+Game::Game() :
  isPause(false),
  isWinner(false), 
  isOneUp(false),
@@ -67,23 +67,23 @@ Game::~Game()
 
 void Game::run()
 {
- printMap(map);
- printScore(score);
- printHightScore(hightScore);
- printCountOfLives(pacman->getLivesCount());
- printPacman(*pacman, true);
+ drawManager.printMap(map);
+ drawManager.printScore(score);
+ drawManager.printHightScore(hightScore);
+ drawManager.printCountOfLives(pacman->getLivesCount());
+ drawManager.printPacman(*pacman, true);
 
  for (int i = 0; i < getCountOfGhosts(); i++)
  {
   if (NULL != ghosts[i])
   {
-   printGhost(*ghosts[i], false, fruit, map);
+   drawManager.printGhost(*ghosts[i], false, fruit, map);
   }
  }
 
- printReady(true);
+ drawManager.printReady(true);
  Sleep(2500);
- printReady(false);
+ drawManager.printReady(false);
  
  auto startTime = std::chrono::high_resolution_clock::now();
 
@@ -115,8 +115,8 @@ void Game::updateFrame(float deltaTime)
     gameWin();
     winTime = 0;
    }
-   printMap(map, isWinner);
-   printPacman(*pacman, true);
+   drawManager.printMap(map, isWinner);
+   drawManager.printPacman(*pacman, true);
   }
   else
   {
@@ -133,7 +133,7 @@ void Game::updateFrame(float deltaTime)
 
    if (unitMoveTime > unitMoveTimer)
    {
-    printOneUp(isOneUp);
+    drawManager.printOneUp(isOneUp);
 
     movePlayer();
     moveNormalGhosts();
@@ -219,7 +219,7 @@ void Game::keyPressed(unsigned char ch)
  if ('P' == ch)
  {
   isPause = !isPause;
-  printPause(isPause);
+  drawManager.printPause(isPause);
  }
  else if ('W' == ch || arrow == getArrowUp())
  {
@@ -398,7 +398,7 @@ void Game::gameOver()
   fout << score;
  }
 
- printGameOver();
+ drawManager.printGameOver();
 
  Sleep(3000);
 
@@ -412,22 +412,22 @@ void Game::gameWin()
 
  combo = 100;
 
- printPacman(*pacman, false);
+ drawManager.printPacman(*pacman, false);
  initMap();
- printMap(map);
+ drawManager.printMap(map);
  pacman->setPosition(getStartX(), getStartY());
  pacman->setDirection(getDirectionLeft());
 
  for (int i = 0; i < getCountOfGhosts(); i++)
  {
   ghosts[i]->toStartPosition();
-  printGhost(*ghosts[i], false, fruit, map);
+  drawManager.printGhost(*ghosts[i], false, fruit, map);
  }
- printPacman(*pacman, true);
+ drawManager.printPacman(*pacman, true);
 
- printReady(true);
+ drawManager.printReady(true);
  Sleep(2500);
- printReady(false);
+ drawManager.printReady(false);
 
  level++;
 
@@ -483,8 +483,8 @@ void Game::movePlayer()
  if (!isColision(temp.getX(), temp.getY()))
  {
   pacman->move();
-  printPacman(*pacman, false);
-  printPacman(*pacman, true);
+  drawManager.printPacman(*pacman, false);
+  drawManager.printPacman(*pacman, true);
   checkFood();
   checkDeath();
  }
@@ -500,8 +500,8 @@ void Game::moveNormalGhosts()
   {
    ghosts[i]->makeMove();
 
-   printGhost(*ghosts[i], false, fruit, map);
-   printPacman(*pacman, true);
+   drawManager.printGhost(*ghosts[i], false, fruit, map);
+   drawManager.printPacman(*pacman, true);
    checkDeath();
   }
  }
@@ -514,8 +514,8 @@ void Game::moveAbnormalGhosts(int mode)
   if (mode == ghosts[i]->getMode())
   {
    ghosts[i]->makeMove();
-   printGhost(*ghosts[i], false, fruit, map);
-   printPacman(*pacman, true);
+   drawManager.printGhost(*ghosts[i], false, fruit, map);
+   drawManager.printPacman(*pacman, true);
    checkDeath();
   }
  }
@@ -528,7 +528,7 @@ void Game::warnPlayer()
  {
   if (ghosts[i]->getMode() == getModeFrightened())
   {
-   printGhost(*ghosts[i], warning, fruit, map);
+   drawManager.printGhost(*ghosts[i], warning, fruit, map);
   }
  }
 }
@@ -664,10 +664,10 @@ void Game::checkFood()
   {
    fruits.pop_back();
   }
-  printFruits(fruits);
+  drawManager.printFruits(fruits);
   isFruitSetted = false;
  }
- printScore(score);
+ drawManager.printScore(score);
 }
 
 void Game::setFruit()
@@ -678,7 +678,7 @@ void Game::setFruit()
  int y = getFruitY();
  
  map[y][x] = fruitChar;
- printFruit(x, y + getInfoScoreFieldHeight(), fruit);
+ drawManager.printFruit(x, y + getInfoScoreFieldHeight(), fruit);
 
  isFruitSetted = true;
 }
@@ -699,25 +699,25 @@ void Game::checkDeath()
    {
     combo *= 2;
     score += combo;
-    printCombo(*pacman, map, combo);
-    printGhost(*ghosts[i], false, fruit, map);
+    drawManager.printCombo(*pacman, map, combo);
+    drawManager.printGhost(*ghosts[i], false, fruit, map);
     ghosts[i]->setMode(getModeDead());
    }
   }
  }
- printCountOfLives(pacman->getLivesCount());
+ drawManager.printCountOfLives(pacman->getLivesCount());
 }
 
 void Game::death()
 {
  pacman->death();
  
- paintPlayingField(getColorBlack());
+ drawManager.paintPlayingField(getColorBlack());
  
- printCountOfLives(pacman->getLivesCount());
+ drawManager.printCountOfLives(pacman->getLivesCount());
  Sleep(200);
 
- printDyingPacman();
+ drawManager.printDyingPacman();
 
  if (pacman->getLivesCount() == 0)
  {
@@ -732,17 +732,17 @@ void Game::death()
  waveCount = 0;
  waveTime = 0;
 
- printMap(map);
+ drawManager.printMap(map);
  pacman->setPosition(getStartX(), getStartY());
  pacman->setDirection(getDirectionLeft());
  for (int i = 0; i < getCountOfGhosts(); i++)
  {
   ghosts[i]->toStartPosition();
-  printGhost(*ghosts[i], false, fruit, map);
+  drawManager.printGhost(*ghosts[i], false, fruit, map);
  }
- printPacman(*pacman, true);
+ drawManager.printPacman(*pacman, true);
 
- printReady(true);
+ drawManager.printReady(true);
  Sleep(2500);
- printReady(false);
+ drawManager.printReady(false);
 }

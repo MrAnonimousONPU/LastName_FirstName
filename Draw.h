@@ -17,7 +17,6 @@ class Draw : protected View
 public:
  Draw();
 
-protected:
  void printMap(const std::vector<std::string>& map, bool winner = false);
  void printOneUp(bool& isOneUp);
  void printHightScore(const int& hightScore);

@@ -22,7 +22,7 @@
 #include "Clyde.h"
 #include "Draw.h"
 
-class Game : Draw
+class Game
 {
 public:
  Game();
@@ -99,6 +99,7 @@ private:
  std::deque<int> fruits;
 
  Player* pacman;
+ Draw drawManager;
 };
 
 #endif
