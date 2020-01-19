@@ -510,34 +510,34 @@ void Game::changeWave()
  {
  case 1:
   waveMod = getModeChase();
-  waveTimer = static_cast<float>(20);
+  waveTimer.setTimer(20);
   break;
  case 2:
   waveMod = getModeScatter();
   if (level < 5)
-   waveTimer = static_cast<float>(7);
+   waveTimer.setTimer(7);
   else
-   waveTimer = static_cast<float>(5);
+   waveTimer.setTimer(5);
   break;
  case 3:
   waveMod = getModeChase();
-  waveTimer = static_cast<float>(20);
+  waveTimer.setTimer(20);
   break;
  case 4:
   waveMod = getModeScatter();
-  waveTimer = static_cast<float>(5) / level;
+  waveTimer.setTimer(5 / level);
   break;
  case 5:
   waveMod = getModeChase();
-  waveTimer = static_cast<float>(20) * level;
+  waveTimer.setTimer(20 * level);
   break;
  case 6:
   waveMod = getModeScatter();
-  waveTimer = static_cast<float>(5) / level;
+  waveTimer.setTimer(5 / level);
   break;
  case 7:
   waveMod = getModeChase();
-  waveTimer = 0.01f;
+  waveTimer.setTimer(0.01);
   break;
  default :
   waveMod = getModeChase();

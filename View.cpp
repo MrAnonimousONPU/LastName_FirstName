@@ -2,10 +2,7 @@
 
 void View::SetWindowTitle()
 {
- TCHAR name[7] = (__TEXT("Pacman"));
- int height = getInfoLivesFieldHeight();
- height += getPlayingFieldHeight() + getInfoScoreFieldHeight();
- SetConsoleTitle(name);
+ SetConsoleTitle(L"Pacman");
 }
 
 void View::setFont()
