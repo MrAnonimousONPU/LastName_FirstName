@@ -15,16 +15,7 @@ Game::Game() :
  level(1), 
  blinky(0),
 
- waveTime(0),
- unitMoveTime(0),
- deadGhostMoveTime(0),
- frightenedMoveTime(0),
- winTime(0),
- spawnFruitTime(0),
- superTime(0),
- warningTime(0),
- checkWaitTime(0),
-
+ checkWaitTimer(1),
  superTimer(10.0f),
  waveTimer(7.0f),
  unitMoveTimer(0.15f), 
@@ -109,65 +100,50 @@ void Game::updateFrame(float deltaTime)
  {
   if (isWinner)
   {
-   winTime += deltaTime;
-   if (winTime > winTimer)
+   if (winTimer(deltaTime))
    {
     gameWin();
-    winTime = 0;
    }
    drawManager.printMap(map, isWinner);
    drawManager.printPacman(*pacman, true);
   }
   else
   {
-   unitMoveTime += deltaTime;
-   deadGhostMoveTime += deltaTime;
-   frightenedMoveTime += deltaTime;
-   checkWaitTime += deltaTime;
 
-   if (checkWaitTime > 1)
+   if (checkWaitTimer(deltaTime))
    {
     releaseGhosts();
-    checkWaitTime = 0;
    }
 
-   if (unitMoveTime > unitMoveTimer)
+   if (unitMoveTimer(deltaTime))
    {
     drawManager.printOneUp(isOneUp);
 
     movePlayer();
     moveNormalGhosts();
-    unitMoveTime = 0;
    }
 
-   if (deadGhostMoveTime > deadGhostMoveTimer)
+   if (deadGhostMoveTimer(deltaTime))
    {
     moveAbnormalGhosts(getModeDead());
-    deadGhostMoveTime = 0;
    }
 
-   if (frightenedMoveTime > frightenedMoveTimer)
+   if (frightenedMoveTimer(deltaTime))
    {
     moveAbnormalGhosts(getModeFrightened());
-    frightenedMoveTime = 0;
    }
 
    if (pacman->isSuper())
    {
-
-    superTime += deltaTime;
-
-    if (superTime > (superTimer - 3))
+    if (3 > superTimer.getTime())
     {
-     warningTime += deltaTime;
-     if (warningTime > warningTimer)
+     if (warningTimer(deltaTime))
      {
       warnPlayer();
-      warningTime = 0;
      }
     }
 
-    if(superTime > superTimer)
+    if(superTimer(deltaTime))
     {
      setSuper(false);
     }
@@ -176,26 +152,22 @@ void Game::updateFrame(float deltaTime)
    {
     if (7 != waveCount)
     {
-     waveTime += deltaTime;
+     if (waveTimer(deltaTime))
+     {
+      changeWave();
+     }
+
      for (int i = 0; i < getCountOfGhosts(); i++)
       if (ghosts[i]->getMode() == getReverseMod(waveMod))
        ghosts[i]->setMode(waveMod);
-    }
-
-    if (waveTime > waveTimer)
-    {
-     changeWave();
-     waveTime = 0;
     }
    }
 
 	  if (!isFruitSetted)
 	  {
-    spawnFruitTime += deltaTime;
-    if (spawnFruitTime > spawnFruitTimer)
+    if (spawnFruitTimer(deltaTime))
     {
      setFruit();
-     spawnFruitTime = 0;
     }
 	  }
   }
@@ -213,9 +185,6 @@ void Game::keyPressed(unsigned char ch)
  }
  ch = std::toupper(ch);
 
- int x = pacman->getPosition().getX();
- int y = pacman->getPosition().getY();
-
  if ('P' == ch)
  {
   isPause = !isPause;
@@ -223,7 +192,7 @@ void Game::keyPressed(unsigned char ch)
  }
  else if ('W' == ch || arrow == getArrowUp())
  {
-  if (!isColision(x, y - 1))
+  if (!isColision(pacman->getPosition() + getDirectionUp()))
   {
    pacman->setDirection(getDirectionUp());
   }
@@ -231,7 +200,7 @@ void Game::keyPressed(unsigned char ch)
  }
  else if ('S' == ch || arrow == getArrowDown())
  {
-  if (!isColision(x, y + 1))
+  if (!isColision(pacman->getPosition() + getDirectionDown()))
   {
    pacman->setDirection(getDirectionDown());
   }
@@ -239,16 +208,7 @@ void Game::keyPressed(unsigned char ch)
  }
  else if ('D' == ch || arrow == getArrowRight())
  {
-  const bool isOutOfBounds = (x == getPlayingFieldWidth() - 1);
-  if (isOutOfBounds)
-  {
-   x = 0;
-  }
-  else
-  {
-   x++;
-  }
-  if (!isColision(x, y))
+  if (!isColision(pacman->getPosition() + getDirectionRight()))
   {
    pacman->setDirection(getDirectionRight());
   }
@@ -256,16 +216,7 @@ void Game::keyPressed(unsigned char ch)
  }
  else if ('A' == ch || arrow == getArrowLeft())
  {
-  const bool isOutOfBounds = (x == 0);
-  if (isOutOfBounds)
-  {
-   x = getPlayingFieldWidth() - 1;
-  }
-  else
-  {
-   x--;
-  }
-  if (!isColision(x, y))
+  if (!isColision(pacman->getPosition() + getDirectionLeft()))
   {
    pacman->setDirection(getDirectionLeft());
   }
@@ -433,15 +384,14 @@ void Game::gameWin()
 
  if (5 < level)
  {
-  waveTimer = static_cast<float>(7);
+  superTimer.setTimer(5);
  }
  else if (10 < level)
  {
-  superTimer -= 1;
+  superTimer.setTimer(superTimer.getMaxTime() - 1);
  }
- waveTimer = static_cast<float>(5);
+ waveTimer.setTimer(5);
  waveCount = 0;
- waveTime = 0;
 
  if (level > 255)
  {
@@ -479,8 +429,7 @@ void Game::releaseGhosts()
 
 void Game::movePlayer()
 {
- Position temp = pacman->getPosition() + pacman->getDirection();
- if (!isColision(temp.getX(), temp.getY()))
+ if (!isColision(pacman->getPosition() + pacman->getDirection()))
  {
   pacman->move();
   drawManager.printPacman(*pacman, false);
@@ -536,7 +485,6 @@ void Game::warnPlayer()
 void Game::setSuper(bool super)
 {
  pacman->setSuper(super);
- superTime = 0;
  for (int i = 0; i < getCountOfGhosts(); i++)
  {
   const int ghostMode = ghosts[i]->getMode();
@@ -597,9 +545,9 @@ void Game::changeWave()
  }
 }
 
-bool Game::isColision(int x, int y)
+bool Game::isColision(Position pos)
 {
- unsigned char ch = map[y][x];
+ unsigned char ch = map[pos.getY()][pos.getX()];
  const unsigned char food = static_cast<unsigned char> (250);
  const unsigned char fruitChar = static_cast<unsigned char> (253);
 
@@ -726,11 +674,10 @@ void Game::death()
  }
 
  if (level < 5)
-  waveTimer = static_cast<float>(7);
+  waveTimer.setTimer(7);
  else
-  waveTimer = static_cast<float>(5);
+  waveTimer.setTimer(5);
  waveCount = 0;
- waveTime = 0;
 
  drawManager.printMap(map);
  pacman->setPosition(getStartX(), getStartY());

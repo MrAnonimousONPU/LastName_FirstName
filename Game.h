@@ -20,7 +20,9 @@
 #include "Pinky.h"
 #include "Inky.h"
 #include "Clyde.h"
+
 #include "Draw.h"
+#include "SimpleTimer.h"
 
 class Game
 {
@@ -35,7 +37,7 @@ private:
  void updateFrame(float deltaTime);
  void keyPressed(unsigned char ch);
 
- bool isColision(int x, int y);
+ bool isColision(Position pos);
  int getReverseMod(int mode);
 
  void initMap();
@@ -75,24 +77,15 @@ private:
  int level;
  const int blinky;
 
- float waveTime;
- float unitMoveTime;
- float deadGhostMoveTime;
- float frightenedMoveTime;
- float winTime;
- float spawnFruitTime;
- float superTime;
- float warningTime;
- float checkWaitTime;
-
- float superTimer;
- float waveTimer;
- const float unitMoveTimer;
- const float deadGhostMoveTimer;
- const float frightenedMoveTimer;
- const float winTimer;
- const float spawnFruitTimer;
- const float warningTimer;
+ SimpleTimer superTimer;
+ SimpleTimer waveTimer;
+ SimpleTimer checkWaitTimer;
+ const SimpleTimer unitMoveTimer;
+ const SimpleTimer deadGhostMoveTimer;
+ const SimpleTimer frightenedMoveTimer;
+ const SimpleTimer winTimer;
+ const SimpleTimer spawnFruitTimer;
+ const SimpleTimer warningTimer;
 
  std::vector<std::string> map;
  Ghost* ghosts[4];

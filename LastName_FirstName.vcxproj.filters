@@ -57,6 +57,9 @@
     <ClCompile Include="Ghost.cpp">
       <Filter>Исходные файлы\Ghosts</Filter>
     </ClCompile>
+    <ClCompile Include="SimpleTimer.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="View.h">
@@ -91,6 +94,9 @@
     </ClInclude>
     <ClInclude Include="Ghost.h">
       <Filter>Файлы заголовков\Ghosts</Filter>
+    </ClInclude>
+    <ClInclude Include="SimpleTimer.h">
+      <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
