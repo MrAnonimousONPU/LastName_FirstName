@@ -25,7 +25,7 @@ Game::Game() :
  spawnFruitTimer(60.0f), 
  warningTimer(0.2f)
 {
- srand(time(static_cast<unsigned int> (0)));
+ //srand(time(static_cast<unsigned int> (0)));
  pacman = new Player(getStartX(), getStartY());
  initMap();
  initHightScore();
@@ -45,12 +45,12 @@ Game::~Game()
 {
  for (int i = 0; i < getCountOfGhosts(); i++)
  {
-  if (NULL != ghosts[i])
+  if (nullptr != ghosts[i])
   {
    delete ghosts[i];
   }
  }
- if (NULL != pacman)
+ if (nullptr != pacman)
  {
   delete pacman;
  }
@@ -66,14 +66,14 @@ void Game::run()
 
  for (int i = 0; i < getCountOfGhosts(); i++)
  {
-  if (NULL != ghosts[i])
+  if (nullptr != ghosts[i])
   {
    drawManager.printGhost(*ghosts[i], false, fruit, map);
   }
  }
 
  drawManager.printReady(true);
- Sleep(2500);
+ std::this_thread::sleep_for(std::chrono::milliseconds(2500));
  drawManager.printReady(false);
  
  auto startTime = std::chrono::high_resolution_clock::now();
@@ -81,10 +81,10 @@ void Game::run()
  while (true) 
  {
   keyPressed(prevButton);
-  if (_kbhit())
-  {
-   keyPressed(_getch());
-  }
+  //if (kbhit())
+  //{
+  // keyPressed(getch());
+  //}
   auto endTime = std::chrono::high_resolution_clock::now();
   std::chrono::duration<float> duration = endTime - startTime;
   startTime = std::chrono::high_resolution_clock::now();
@@ -181,7 +181,7 @@ void Game::keyPressed(unsigned char ch)
  {
   ch = 0;
 
-  arrow = _getch();
+  //arrow = _getch();
  }
  ch = std::toupper(ch);
 
@@ -350,8 +350,8 @@ void Game::gameOver()
  }
 
  drawManager.printGameOver();
-
- Sleep(3000);
+ 
+ std::this_thread::sleep_for(std::chrono::seconds(2));
 
  std::quick_exit(0);
 }
@@ -377,7 +377,7 @@ void Game::gameWin()
  drawManager.printPacman(*pacman, true);
 
  drawManager.printReady(true);
- Sleep(2500);
+  std::this_thread::sleep_for(std::chrono::milliseconds(2500));
  drawManager.printReady(false);
 
  level++;
@@ -548,8 +548,8 @@ void Game::changeWave()
 bool Game::isColision(Position pos)
 {
  unsigned char ch = map[pos.getY()][pos.getX()];
- const unsigned char food = static_cast<unsigned char> (250);
- const unsigned char fruitChar = static_cast<unsigned char> (253);
+ const auto food = static_cast<unsigned char> (250);
+ const auto fruitChar = static_cast<unsigned char> (253);
 
  const bool isCanGo = (ch == ' ' || ch == food || ch == 'o' || ch == fruitChar);
  bool hasColision = !(isCanGo);
@@ -574,8 +574,8 @@ void Game::checkFood()
  const int x = pacman->getPosition().getX();
  const int y = pacman->getPosition().getY();
 
- const unsigned char food = static_cast<unsigned char> (250);
- const unsigned char fruitChar = static_cast<unsigned char> (253);
+ const auto food = static_cast<unsigned char> (250);
+ const auto fruitChar = static_cast<unsigned char> (253);
  unsigned char currentChar = map[y][x];
 
  if (currentChar == food)
@@ -620,7 +620,7 @@ void Game::checkFood()
 
 void Game::setFruit()
 {
- unsigned char fruitChar = static_cast<unsigned char> (253);
+ auto fruitChar = static_cast<unsigned char> (253);
 
  int x = getFruitX();
  int y = getFruitY();
@@ -660,16 +660,16 @@ void Game::death()
 {
  pacman->death();
  
- drawManager.paintPlayingField(getColorBlack());
+ drawManager.clearALL();
  
  drawManager.printCountOfLives(pacman->getLivesCount());
- Sleep(200);
+ std::this_thread::sleep_for(std::chrono::milliseconds(200));
 
  drawManager.printDyingPacman();
 
  if (pacman->getLivesCount() == 0)
  {
-  Sleep(500);
+   std::this_thread::sleep_for(std::chrono::milliseconds(500));
   gameOver();
  }
 
@@ -690,6 +690,6 @@ void Game::death()
  drawManager.printPacman(*pacman, true);
 
  drawManager.printReady(true);
- Sleep(2500);
+ std::this_thread::sleep_for(std::chrono::milliseconds(2500));
  drawManager.printReady(false);
 }

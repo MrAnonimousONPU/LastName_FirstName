@@ -1,7 +1,6 @@
 #ifndef VIEW_H
 #define VIEW_H
 
-#include <Windows.h>
 #include <iostream>
 #include <string>
 #include "Constants.h"
@@ -16,7 +15,7 @@ protected:
 
  void setChar(int x, int y, char ch = ' ', int color = getColorBlue());
 
- void setString(int x, int y, std::string str, int color = getColorBlack());
+ void clearScreen();
 
  void setWindowSize(int height, int width);
 

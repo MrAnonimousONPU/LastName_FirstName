@@ -2,42 +2,42 @@
 
 int getColorBlack()
 {
- return 0;
+ return 30;
 }
 
 int getColorBlue()
 {
- return 9;
+ return 34;
 }
 
 int getColorCyan()
 {
- return 11;
+ return 36;
 }
 
 int getColorPink()
 {
-	return 13;
+	return 95;
 }
 
 int getColorRed()
 {
- return 12;
+ return 31;
 }
 
 int getColorOrange()
 {
- return 6;
+ return 33;
 }
 
 int getColorYellow()
 {
- return 14;
+ return 93;
 }
 
 int getColorWhite()
 {
- return 15;
+ return 97;
 }
 
 int getCountOfGhosts()

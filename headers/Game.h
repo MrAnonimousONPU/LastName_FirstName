@@ -7,12 +7,10 @@
 #include <fstream>
 
 #include <chrono>
+#include <thread>
 
 #include <vector>
 #include <deque>
-
-#include <Windows.h>
-#include <conio.h>
 
 #include "Player.h"
 #include "Ghost.h"

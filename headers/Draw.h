@@ -3,6 +3,8 @@
 
 #include <iostream>
 #include <fstream>
+#include <chrono>
+#include <thread>
 
 #include <vector>
 #include <string>
@@ -33,7 +35,7 @@ public:
  void printGameOver();
  void printFruit(int x, int y, int color);
  void printDyingPacman();
- void paintPlayingField(int color);
+ void clearALL();
 };
 
 #endif

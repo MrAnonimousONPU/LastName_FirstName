@@ -4,6 +4,7 @@
 #include <vector>
 #include <cmath>
 #include <string>
+#include <limits>
 
 #include "Constants.h"
 #include "Position.h"

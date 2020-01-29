@@ -15,7 +15,7 @@ Draw::Draw()
 void Draw::printMap(const std::vector<std::string>& map, bool winner)
 {
  int y = 0;
- for (std::string i : map)
+ for (const std::string& i : map)
  {
   int x = 0;
   for (unsigned char j : i)
@@ -193,8 +193,8 @@ void Draw::printCombo(const Player& pacman, const std::vector<std::string>& map,
  {
   setChar(x + i, height, text[i], getColorCyan());
  }
-
- Sleep(500);
+  
+  std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
  for (unsigned int i = 0; i < text.length(); i++)
  {
@@ -204,18 +204,18 @@ void Draw::printCombo(const Player& pacman, const std::vector<std::string>& map,
 
 void Draw::printPacman(const Player& pacman, bool show)
 {
- char ch = pacman.getCurrentCharacter();
- int color = pacman.getColor();
+ const int ch = pacman.getCurrentCharacter();
+ const int color = pacman.getColor();
  if (show)
  {
-  int x = pacman.getPosition().getX();
-  int y = pacman.getPosition().getY() + getInfoScoreFieldHeight();
+  const int x = pacman.getPosition().getX();
+  const int y = pacman.getPosition().getY() + getInfoScoreFieldHeight();
   setChar(x, y, ch, color);
  }
  else
  {
-  int x = pacman.getOldPosition().getX();
-  int y = pacman.getOldPosition().getY() + getInfoScoreFieldHeight();
+  const int x = pacman.getOldPosition().getX();
+  const int y = pacman.getOldPosition().getY() + getInfoScoreFieldHeight();
   setChar(x, y);
  }
 }
@@ -246,25 +246,19 @@ void Draw::printDyingPacman()
  unsigned char ch = static_cast<unsigned char> (250);
 
  setChar(x, y, '<', getColorYellow());
- Sleep(200);
+ std::this_thread::sleep_for(std::chrono::milliseconds(200));
  setChar(x, y, 'v', getColorYellow());
- Sleep(200);
+ std::this_thread::sleep_for(std::chrono::milliseconds(200));
  setChar(x, y, '>', getColorYellow());
- Sleep(200);
+ std::this_thread::sleep_for(std::chrono::milliseconds(200));
  setChar(x, y, '^', getColorYellow());
- Sleep(200);
+ std::this_thread::sleep_for(std::chrono::milliseconds(200));
  setChar(x, y, ch, getColorYellow());
- Sleep(200);
+ std::this_thread::sleep_for(std::chrono::milliseconds(200));
  setChar(x, y);
 }
 
-void Draw::paintPlayingField(int color)
+void Draw::clearALL()
 {
- unsigned char ch = static_cast<unsigned char> (219);
- 
- std::string str(ch, getPlayingFieldWidth());
- for (int y = 0; y < getPlayingFieldHeight(); y++)
- {
- setString(0, y + getInfoScoreFieldHeight(), str, color);
- }
+ clearScreen();
 }
