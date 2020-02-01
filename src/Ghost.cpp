@@ -268,8 +268,8 @@ bool Ghost::checkColision(Position point)
   point.setX(getPlayingFieldWidth() - 1);
 
  unsigned char ch = map[point.getY()][point.getX()];
- unsigned char food = static_cast<unsigned char> (250);
- unsigned char fruitChar = static_cast<unsigned char> (253);
+ unsigned char food = '.';
+ auto fruitChar = static_cast<unsigned char> (253);
 
  bool isGate = ((mode == getModeDead() || mode == getModeExiting()) && ch == '-');
 

@@ -22,7 +22,7 @@ void Draw::printMap(const std::vector<std::string>& map, bool winner)
   {
    switch (j)
    {
-    case static_cast<unsigned char> (250) :
+    case '.' :
      setChar(x, y + getInfoScoreFieldHeight(), j, getColorWhite());
      break;
     case 'o':
@@ -34,7 +34,7 @@ void Draw::printMap(const std::vector<std::string>& map, bool winner)
     default:
      if (winner)
      {
-      setChar(x, y + getInfoScoreFieldHeight(), j, rand() % 14);
+      setChar(x, y + getInfoScoreFieldHeight(), j, (rand() % 7) + 91);
      }
      else
      {
@@ -51,18 +51,15 @@ void Draw::printMap(const std::vector<std::string>& map, bool winner)
 void Draw::printOneUp(bool& isOneUp)
 {
  isOneUp = !isOneUp;
- char text[5] = "1 UP";
-
- for (int i = 0; i < 4; i++)
+ std::string str("1 UP");
+ 
+ if (isOneUp)
  {
-  if (isOneUp)
-  {
-   setChar(3 + i, 0);
-  }
-  else
-  {
-   setChar(3 + i, 0, text[i], getColorWhite());
-  }
+  setString(3, 0, str, getColorBlack());
+ }
+ else
+ {
+  setString(3, 0, str, getColorWhite());
  }
 }
 
@@ -71,22 +68,16 @@ void Draw::printHightScore(const int& hightScore)
  std::string text = "HIGHT SCORE : ";
  
  text += std::to_string(hightScore);
-
- for (unsigned int i = 0; i < text.length(); i++)
- {
-  setChar(i + 3, 1, text[i], getColorWhite());
- }
+ 
+ setString(3, 1, text, getColorWhite());
 }
 
 void Draw::printScore(int score)
 {
  std::string text = "SCORE : ";
  text += std::to_string(score);
-
- for (unsigned int i = 0; i < text.length(); i++)
- {
-  setChar(i + 9, 2, text[i], getColorWhite());
- }
+ 
+ setString(9, 2, text, getColorWhite());
 }
 
 void Draw::printCountOfLives(int lives)
@@ -117,37 +108,31 @@ void Draw::printFruits(const std::deque<int>& fruits)
 
 void Draw::printReady(bool show)
 {
- char text[6] = "READY";
+ std::string text("READY");
 
  int y = getInfoScoreFieldHeight() + 17;
-
- for (int i = 0; i < 5; i++)
+ 
+ if (show)
  {
-  if (show)
-  {
-   setChar(i + 11, y, text[i], getColorWhite());
-  }
-  else
-  {
-   setChar(i + 11, y);
-  }
+  setString(11, y, text, getColorWhite());
+ }
+ else
+ {
+  setString(11, y, text, getColorBlack());
  }
 }
 
 void Draw::printPause(bool show)
 {
- char text[6] = "Pause";
+ std::string text("Pause");
  int width = getPlayingFieldWidth() - 5;
  int color = getColorBlack();
  if (show)
  {
   color = getColorRed();
  }
-
- for (int i = 0; i < 5; i++)
- {
-  setChar(width + i, 0, text[i], color);
- }
+ 
+ setString(width, 0, text, color);
 }
 
 void Draw::printGhost(const Ghost& current, bool isWarning,
@@ -156,7 +141,7 @@ void Draw::printGhost(const Ghost& current, bool isWarning,
  int x = current.getOldPosition().getX();
  int y = current.getOldPosition().getY();
  unsigned char ch = map[y][x];
- unsigned char food = static_cast<unsigned char> (250);
+ unsigned char food = '.';
 
  bool isFood = (ch == food || ch == 'o' || ch == '-');
 
@@ -194,7 +179,7 @@ void Draw::printCombo(const Player& pacman, const std::vector<std::string>& map,
   setChar(x + i, height, text[i], getColorCyan());
  }
   
-  std::this_thread::sleep_for(std::chrono::milliseconds(500));
+ std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
  for (unsigned int i = 0; i < text.length(); i++)
  {
@@ -222,14 +207,11 @@ void Draw::printPacman(const Player& pacman, bool show)
 
 void Draw::printGameOver()
 {
- char text[10] = "GAME OVER";
+ std::string text("GAME OVER");
 
  int y = getInfoScoreFieldHeight() + 17;
-
- for (int i = 0; i < 9; i++)
- {
-  setChar(i + 9, y, text[i], getColorWhite());
- }
+ 
+ setString(9, y, text, getColorWhite());
 }
 
 void Draw::printFruit(int x, int y, int color)

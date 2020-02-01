@@ -20,6 +20,7 @@ add_executable(LastName_FirstName
         headers/Position.h
         headers/SimpleTimer.h
         headers/View.h
+        headers/SimpleConio.h
         src/Blinky.cpp
         src/Clyde.cpp
         src/Constants.cpp
@@ -32,4 +33,5 @@ add_executable(LastName_FirstName
         src/Player.cpp
         src/Position.cpp
         src/SimpleTimer.cpp
-        src/View.cpp)
+        src/View.cpp
+        src/SimpleConio.cpp)

@@ -21,6 +21,7 @@
 
 #include "Draw.h"
 #include "SimpleTimer.h"
+#include "SimpleConio.h"
 
 class Game
 {
@@ -91,6 +92,7 @@ private:
 
  Player* pacman;
  Draw drawManager;
+ SimpleConio keyboard;
 };
 
 #endif

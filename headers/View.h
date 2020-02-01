@@ -8,12 +8,14 @@
 class View
 {
 protected:
- //Sets the specified character to the specified position
  void SetWindowTitle();
 
  void setFont();
 
  void setChar(int x, int y, char ch = ' ', int color = getColorBlue());
+ 
+ void setString(int x, int y, const std::string& str, int color = getColorBlue
+ ());
 
  void clearScreen();
 

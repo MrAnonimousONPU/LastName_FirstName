@@ -127,22 +127,22 @@ int getFruitY()
 
 int getArrowUp()
 {
- return 72;
+ return 'A';
 }
 
 int getArrowDown()
 {
- return 80;
+ return 'B';
 }
 
 int getArrowRight()
 {
- return 77;
+ return 'C';
 }
 
 int getArrowLeft()
 {
- return 75;
+ return 'D';
 }
 
 int getGhostBlinky()

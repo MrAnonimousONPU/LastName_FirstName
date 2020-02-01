@@ -9,7 +9,7 @@ Game::Game() :
 
  waveCount(0),
  waveMod(getModeScatter()),
- amountOfFood(0), 
+ amountOfFood(getMaxFood()),
  score(0), 
  combo(100), 
  level(1), 
@@ -22,10 +22,9 @@ Game::Game() :
  deadGhostMoveTimer(0.05f), 
  frightenedMoveTimer(0.3f),
  winTimer(1.0f), 
- spawnFruitTimer(60.0f), 
+ spawnFruitTimer(15.0f),
  warningTimer(0.2f)
 {
- //srand(time(static_cast<unsigned int> (0)));
  pacman = new Player(getStartX(), getStartY());
  initMap();
  initHightScore();
@@ -81,16 +80,15 @@ void Game::run()
  while (true) 
  {
   keyPressed(prevButton);
-  //if (kbhit())
-  //{
-  // keyPressed(getch());
-  //}
+  if (keyboard.kbhit())
+  {
+    keyPressed(keyboard.getch());
+  }
   auto endTime = std::chrono::high_resolution_clock::now();
   std::chrono::duration<float> duration = endTime - startTime;
   startTime = std::chrono::high_resolution_clock::now();
 
   updateFrame(duration.count());
-  //printFPS(duration.count());
  }
 }
 
@@ -177,11 +175,14 @@ void Game::updateFrame(float deltaTime)
 void Game::keyPressed(unsigned char ch)
 {
  int arrow = 0;
- if (224 == ch)
+ if ('\e' == ch)
  {
-  ch = 0;
-
-  //arrow = _getch();
+  ch = keyboard.getch();
+    if ('[' == ch)
+    {
+      ch = 0;
+      arrow = keyboard.getch();
+    }
  }
  ch = std::toupper(ch);
 
@@ -230,102 +231,38 @@ void Game::initMap()
 {
  map = 
  {
-  "1555555555555555555555555552",
-  "6............^^............6",
-  "6.!%%@.!%%%@.^^.!%%%@.!%%@.6",
-  "6o^  ^.^   ^.^^.^   ^.^  ^o6",
-  "6.#%%$.#%%%$.#$.#%%%$.#%%$.6",
-  "6..........................6",
-  "6.!%%@.!@.!%%%%%%@.!@.!%%@.6",
-  "6.#%%$.^^.#%%@!%%$.^^.#%%$.6",
-  "6......^^....^^....^^......6",
-  "355552.^#%%@ ^^ !%%$^.155554",
-  "     6.^!%%$ #$ #%%@^.6     ",
-  "     6.^^          ^^.6     ",
-  "     6.^^ 155--552 ^^.6     ",
-  "555554.#$ 6      6 #$.355555",
-  "      .   6      6   .      ",
-  "555552.!@ 6      6 !@.155555",
-  "     6.^^ 35555554 ^^.6     ",
-  "     6.^^          ^^.6     ",
-  "     6.^^ !%%%%%%@ ^^.6     ",
-  "155554.#$ #%%@!%%$ #$.355552",
-  "6............^^............6",
-  "6.!%%@.!%%%@.^^.!%%%@.!%%@.6",
-  "6.#%@^.#%%%$.#$.#%%%$.^!%$.6",
-  "6o..^^.......  .......^^..o6",
-  "6%@.^^.!@.!%%%%%%@.!@.^^.!%6",
-  "6%$.#$.^^.#%%@!%%$.^^.#$.#%6",
-  "6......^^....^^....^^......6",
-  "6.!%%%%$#%%@.^^.!%%$#%%%%@.6",
-  "6.#%%%%%%%%$.#$.#%%%%%%%%$.6",
-  "6..........................6",
-  "3555555555555555555555555554" 
+  "____________________________",
+  "|............||............|",
+  "|.|~~|.|~~~|.||.|~~~|.|~~|.|",
+  "|o|  |.|   |.||.|   |.|  |o|",
+  "|.|__|.|___|.\\/.|___|.|__|.|",
+  "|..........................|",
+  "|.|~~|.TT.|~~~~~~|.TT.|~~|.|",
+  "|.|__|.||.|__  __|.||.|__|.|",
+  "|......||....||....||......|",
+  "|_____.| ~~| || |~~ |._____|",
+  "     |.|___| \\/ |__ |.|     ",
+  "     |.||          ||.|     ",
+  "     |.|| |~~--~~| ||.|     ",
+  "_____|.\\/ |      | \\/.|_____",
+  "      .   |      |   .      ",
+  "______.TT |      | TT.______",
+  "     |.|| |______| ||.|     ",
+  "     |.||          ||.|     ",
+  "     |.|| |~~~~~~| ||.|     ",
+  "_____|.\\/ |__  __| \\/.|_____",
+  "|............||............|",
+  "|.|~~|.|~~~|.||.|~~~|.|~~|.|",
+  "|.|_ |.|___|.\\/.|___|.| _|.|",
+  "|o..||.......  .......||..o|",
+  "|~|.||.TT.|~~~~~~|.TT.||.|~|",
+  "|_|.\\/.||.|__  __|.||.\\/.|_|",
+  "|......||....||....||......|",
+  "|.|~~~~  ~~|.||.|~~  ~~~~|.|",
+  "|.|________|.~~.|________|.|",
+  "|..........................|",
+  "|__________________________|"
  };
- for (int y = 0; y < getPlayingFieldHeight(); ++y) 
- {
-  for (int x = 0; x < getPlayingFieldWidth(); ++x) 
-  {
-   char current = map[y][x];
-   if ('.' == current)
-   {
-    amountOfFood++;
-    map[y][x] = static_cast<unsigned char> (250);
-   }
-   else if ('o' == current)
-   {
-    amountOfFood++;
-   }
-   else if ('1' == current)
-   {
-    map[y][x] = static_cast<unsigned char> (201);
-   }
-   else if ('2' == current)
-   {
-    map[y][x] = static_cast<unsigned char> (187);
-   }
-   else if ('3' == current)
-   {
-    map[y][x] = static_cast<unsigned char> (200);
-   }
-   else if ('4' == current)
-   {
-    map[y][x] = static_cast<unsigned char> (188);
-   }
-   else if ('5' == current)
-   {
-    map[y][x] = static_cast<unsigned char> (205);
-   }
-   else if ('6' == current)
-   {
-    map[y][x] = static_cast<unsigned char> (186);
-   }
-   else if ('!' == current)
-   {
-    map[y][x] = static_cast<unsigned char> (218);
-   }
-   else if ('@' == current)
-   {
-    map[y][x] = static_cast<unsigned char> (191);
-   }
-   else if ('#' == current)
-   {
-    map[y][x] = static_cast<unsigned char> (192);
-   }
-   else if ('$' == current)
-   {
-    map[y][x] = static_cast<unsigned char> (217);
-   }
-   else if ('%' == current)
-   {
-    map[y][x] = static_cast<unsigned char> (196);
-   }
-   else if ('^' == current)
-   {
-    map[y][x] = static_cast<unsigned char> (179);
-   }
-  }
- }
 }
 
 void Game::initHightScore()
@@ -365,6 +302,7 @@ void Game::gameWin()
 
  drawManager.printPacman(*pacman, false);
  initMap();
+ amountOfFood = getMaxFood();
  drawManager.printMap(map);
  pacman->setPosition(getStartX(), getStartY());
  pacman->setDirection(getDirectionLeft());
@@ -525,15 +463,15 @@ void Game::changeWave()
   break;
  case 4:
   waveMod = getModeScatter();
-  waveTimer.setTimer(5 / level);
+  waveTimer.setTimer(5.0f / static_cast<float>(level));
   break;
  case 5:
   waveMod = getModeChase();
-  waveTimer.setTimer(20 * level);
+  waveTimer.setTimer(20.0f * static_cast<float>(level));
   break;
  case 6:
   waveMod = getModeScatter();
-  waveTimer.setTimer(5 / level);
+  waveTimer.setTimer(5.0f / static_cast<float>(level));
   break;
  case 7:
   waveMod = getModeChase();
@@ -548,7 +486,7 @@ void Game::changeWave()
 bool Game::isColision(Position pos)
 {
  unsigned char ch = map[pos.getY()][pos.getX()];
- const auto food = static_cast<unsigned char> (250);
+ const auto food = '.';
  const auto fruitChar = static_cast<unsigned char> (253);
 
  const bool isCanGo = (ch == ' ' || ch == food || ch == 'o' || ch == fruitChar);
@@ -574,7 +512,7 @@ void Game::checkFood()
  const int x = pacman->getPosition().getX();
  const int y = pacman->getPosition().getY();
 
- const auto food = static_cast<unsigned char> (250);
+ const auto food = '.';
  const auto fruitChar = static_cast<unsigned char> (253);
  unsigned char currentChar = map[y][x];
 
@@ -594,6 +532,7 @@ void Game::checkFood()
   combo = 100;
 
   setSuper(true);
+  superTimer.setTimer(superTimer.getMaxTime());
 
   map[y][x] = ' ';
   amountOfFood--;
@@ -625,8 +564,10 @@ void Game::setFruit()
  int x = getFruitX();
  int y = getFruitY();
  
+ fruit = (rand() % 7) + 91;
+ 
  map[y][x] = fruitChar;
- drawManager.printFruit(x, y + getInfoScoreFieldHeight(), fruit);
+ drawManager.printFruit(x, y, fruit);
 
  isFruitSetted = true;
 }
@@ -679,6 +620,7 @@ void Game::death()
   waveTimer.setTimer(5);
  waveCount = 0;
 
+ drawManager.printHightScore(hightScore);
  drawManager.printMap(map);
  pacman->setPosition(getStartX(), getStartY());
  pacman->setDirection(getDirectionLeft());
@@ -688,7 +630,10 @@ void Game::death()
   drawManager.printGhost(*ghosts[i], false, fruit, map);
  }
  drawManager.printPacman(*pacman, true);
-
+ 
+ map[getFruitY()][getFruitX()] = ' ';
+ isFruitSetted = false;
+ 
  drawManager.printReady(true);
  std::this_thread::sleep_for(std::chrono::milliseconds(2500));
  drawManager.printReady(false);

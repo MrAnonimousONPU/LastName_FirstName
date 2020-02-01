@@ -2,7 +2,7 @@
 
 void View::SetWindowTitle()
 {
- //TODO :: set window title "PACMAN"
+ std::cout << "\033]0;Pacman\007";
 }
 
 void View::setFont()
@@ -15,10 +15,23 @@ void View::setChar(int x, int y, char ch, int color)
 {
  setColor(color);
 
- std::cout << "\e[" << y << ";" << x << "H";
+ std::cout << "\e[" << y + 1 << ";" << x + 1 << "H";
 
  std::cout << ch;
+ std::cout.flush();
 
+ setColor(getColorWhite());
+}
+
+void View::setString(int x, int y, const std::string& str, int color)
+{
+ setColor(color);
+
+ std::cout << "\e[" << y + 1 << ";" << x + 1 << "H";
+
+ std::cout << str;
+ std::cout.flush();
+ 
  setColor(getColorWhite());
 }
 
@@ -28,12 +41,12 @@ void View::setColor(int color)
 }
 
 void View::setWindowSize(int height, int width) {
- std::cout << "\e[8;" << height << ";" << width << ";t";
+ std::cout << "\e[8;" << height << ";" << width << "t";
 }
 
 void View::setWidowPos(int x, int y)
 {
- //TODO :: create function;
+  std::cout << "\e[3;" << x + 1 << ";" << y + 1 << "t";
 }
 
 void View::setCursorVisibility(bool show)
@@ -50,5 +63,8 @@ void View::setCursorVisibility(bool show)
 
 void View::clearScreen()
 {
-  std::cout << "\e[2J";
+  for (int i = 0; i < 100; i++)
+  {
+    std::cout << std::endl;
+  }
 }
