@@ -625,8 +625,10 @@ void Game::setFruit()
  int x = getFruitX();
  int y = getFruitY();
  
+ fruit = (rand() % 14) + 1;
+
  map[y][x] = fruitChar;
- drawManager.printFruit(x, y + getInfoScoreFieldHeight(), fruit);
+ drawManager.printFruit(x, y, fruit);
 
  isFruitSetted = true;
 }
